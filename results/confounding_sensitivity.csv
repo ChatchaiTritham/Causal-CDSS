@@ -1,0 +1,4 @@
+domain,observational_effect,causal_effect,confounding_bias,risk_ratio,e_value
+sepsis,0.0985,-0.1805,0.2790,1.2969,1.9174
+ards,0.0614,-0.1432,0.2047,1.1595,1.5895
+acs,0.1263,-0.1945,0.3208,1.4264,2.2062

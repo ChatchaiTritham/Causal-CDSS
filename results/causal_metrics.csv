@@ -1,0 +1,10 @@
+domain,estimator,ate_estimate,cee,ate_alignment_score,confounding_bias_magnitude,causal_consistency_index,counterfactual_prediction_accuracy
+sepsis,naive,0.0985,0.2474,0.0000,0.2790,0.9516,1.0000
+sepsis,backdoor_regression,-0.1704,0.0216,0.8551,0.2790,0.9516,1.0000
+sepsis,doubly_robust,-0.1624,0.0135,0.9092,0.2790,0.9516,1.0000
+ards,naive,0.0614,0.1745,0.0000,0.2047,0.7436,1.0000
+ards,backdoor_regression,-0.1275,0.0144,0.8727,0.2047,0.7436,1.0000
+ards,doubly_robust,-0.1274,0.0143,0.8736,0.2047,0.7436,1.0000
+acs,naive,0.1263,0.2983,0.0000,0.3208,0.9474,1.0000
+acs,backdoor_regression,-0.2073,0.0353,0.7949,0.3208,0.9474,1.0000
+acs,doubly_robust,-0.1960,0.0240,0.8605,0.3208,0.9474,1.0000
