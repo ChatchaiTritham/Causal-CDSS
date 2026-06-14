@@ -1,0 +1,382 @@
+{
+  "seed": 42,
+  "n_obs_per_domain": 8000,
+  "n_interventional_per_arm": 8000,
+  "domains": {
+    "sepsis": {
+      "label": "Sepsis - Early Antibiotics",
+      "n_obs": 8000,
+      "treatment_prevalence": 0.450625,
+      "mortality_rate": 0.376125,
+      "true_ate": -0.14887499999999998,
+      "adjustment_set_identified": [
+        "severity"
+      ],
+      "estimators": {
+        "naive": 0.09849516929937091,
+        "backdoor_regression": -0.17044331525989836,
+        "doubly_robust": -0.16239189306459031
+      },
+      "causal_metrics": {
+        "per_estimator": {
+          "naive": {
+            "ate_estimate": 0.09849516929937091,
+            "cee": 0.2473701692993709,
+            "ate_alignment_score": 0.0
+          },
+          "backdoor_regression": {
+            "ate_estimate": -0.17044331525989836,
+            "cee": 0.021568315259898385,
+            "ate_alignment_score": 0.8551246666001787
+          },
+          "doubly_robust": {
+            "ate_estimate": -0.16239189306459031,
+            "cee": 0.013516893064590335,
+            "ate_alignment_score": 0.9092064277777308
+          }
+        },
+        "confounding_bias_magnitude": 0.2789951692993709,
+        "causal_consistency_index": 0.9515919776897038,
+        "counterfactual_prediction_accuracy": 1.0
+      },
+      "confounding": {
+        "observational_effect": 0.09849516929937091,
+        "causal_effect": -0.1805,
+        "bias": 0.2789951692993709,
+        "relative_bias_pct": -154.5679608306764
+      },
+      "cate_subgroups": [
+        {
+          "domain": "sepsis",
+          "age_group": "age_low",
+          "severity_group": "sev_low",
+          "true_cate": -0.05303342225903773,
+          "estimated_cate": -0.06397988283249455,
+          "n_obs": 1525
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_low",
+          "severity_group": "sev_mid",
+          "true_cate": -0.16759776536312845,
+          "estimated_cate": -0.1762380946407999,
+          "n_obs": 724
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_low",
+          "severity_group": "sev_high",
+          "true_cate": -0.306701439784762,
+          "estimated_cate": -0.26587879510929324,
+          "n_obs": 422
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_mid",
+          "severity_group": "sev_low",
+          "true_cate": -0.10994748675908096,
+          "estimated_cate": -0.09098004175179239,
+          "n_obs": 874
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_mid",
+          "severity_group": "sev_mid",
+          "true_cate": -0.23642209818112359,
+          "estimated_cate": -0.21616679116185308,
+          "n_obs": 879
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_mid",
+          "severity_group": "sev_high",
+          "true_cate": -0.28051651739119887,
+          "estimated_cate": -0.2650603782292199,
+          "n_obs": 809
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_high",
+          "severity_group": "sev_low",
+          "true_cate": -0.17558620689655172,
+          "estimated_cate": -0.11742707104889913,
+          "n_obs": 398
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_high",
+          "severity_group": "sev_mid",
+          "true_cate": -0.23522956753667362,
+          "estimated_cate": -0.24858713659510018,
+          "n_obs": 713
+        },
+        {
+          "domain": "sepsis",
+          "age_group": "age_high",
+          "severity_group": "sev_high",
+          "true_cate": -0.1929646352723522,
+          "estimated_cate": -0.16041883758741615,
+          "n_obs": 1656
+        }
+      ],
+      "cate_true_range": [
+        -0.306701439784762,
+        -0.05303342225903773
+      ],
+      "sensitivity": {
+        "risk_ratio": 1.2969041625999556,
+        "e_value": 1.9174331662485653
+      }
+    },
+    "ards": {
+      "label": "ARDS - Low Tidal Volume",
+      "n_obs": 8000,
+      "treatment_prevalence": 0.464125,
+      "mortality_rate": 0.413625,
+      "true_ate": -0.11312500000000003,
+      "adjustment_set_identified": [
+        "severity"
+      ],
+      "estimators": {
+        "naive": 0.06142138864759461,
+        "backdoor_regression": -0.12752471335961563,
+        "doubly_robust": -0.12742334761766397
+      },
+      "causal_metrics": {
+        "per_estimator": {
+          "naive": {
+            "ate_estimate": 0.06142138864759461,
+            "cee": 0.17454638864759464,
+            "ate_alignment_score": 0.0
+          },
+          "backdoor_regression": {
+            "ate_estimate": -0.12752471335961563,
+            "cee": 0.014399713359615596,
+            "ate_alignment_score": 0.8727097161580942
+          },
+          "doubly_robust": {
+            "ate_estimate": -0.12742334761766397,
+            "cee": 0.014298347617663937,
+            "ate_alignment_score": 0.8736057669156779
+          }
+        },
+        "confounding_bias_magnitude": 0.2046713886475946,
+        "causal_consistency_index": 0.7435574360082116,
+        "counterfactual_prediction_accuracy": 1.0
+      },
+      "confounding": {
+        "observational_effect": 0.06142138864759461,
+        "causal_effect": -0.14325,
+        "bias": 0.2046713886475946,
+        "relative_bias_pct": -142.8770601379369
+      },
+      "cate_subgroups": [
+        {
+          "domain": "ards",
+          "age_group": "age_low",
+          "severity_group": "sev_low",
+          "true_cate": -0.05423099572419797,
+          "estimated_cate": -0.1000036787528619,
+          "n_obs": 1372
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_low",
+          "severity_group": "sev_mid",
+          "true_cate": -0.15405320381742368,
+          "estimated_cate": -0.10133606112460222,
+          "n_obs": 769
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_low",
+          "severity_group": "sev_high",
+          "true_cate": -0.17052785923753672,
+          "estimated_cate": -0.18588004390221158,
+          "n_obs": 530
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_mid",
+          "severity_group": "sev_low",
+          "true_cate": -0.0859308162486987,
+          "estimated_cate": -0.09370604908620517,
+          "n_obs": 870
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_mid",
+          "severity_group": "sev_mid",
+          "true_cate": -0.19116595548379656,
+          "estimated_cate": -0.13746321248669618,
+          "n_obs": 886
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_mid",
+          "severity_group": "sev_high",
+          "true_cate": -0.22238869106322395,
+          "estimated_cate": -0.19177918875173788,
+          "n_obs": 806
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_high",
+          "severity_group": "sev_low",
+          "true_cate": -0.14787632859922017,
+          "estimated_cate": -0.09691692255587778,
+          "n_obs": 484
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_high",
+          "severity_group": "sev_mid",
+          "true_cate": -0.173923866515031,
+          "estimated_cate": -0.15610918355028208,
+          "n_obs": 798
+        },
+        {
+          "domain": "ards",
+          "age_group": "age_high",
+          "severity_group": "sev_high",
+          "true_cate": -0.13139898812123885,
+          "estimated_cate": -0.12288441400316019,
+          "n_obs": 1485
+        }
+      ],
+      "cate_true_range": [
+        -0.22238869106322395,
+        -0.05423099572419797
+      ],
+      "sensitivity": {
+        "risk_ratio": 1.1594872762763404,
+        "e_value": 1.589514563283091
+      }
+    },
+    "acs": {
+      "label": "ACS - Early Reperfusion",
+      "n_obs": 8000,
+      "treatment_prevalence": 0.441,
+      "mortality_rate": 0.352,
+      "true_ate": -0.172,
+      "adjustment_set_identified": [
+        "severity"
+      ],
+      "estimators": {
+        "naive": 0.1263310333077775,
+        "backdoor_regression": -0.20727173506626104,
+        "doubly_robust": -0.19600206334382478
+      },
+      "causal_metrics": {
+        "per_estimator": {
+          "naive": {
+            "ate_estimate": 0.1263310333077775,
+            "cee": 0.2983310333077775,
+            "ate_alignment_score": 0.0
+          },
+          "backdoor_regression": {
+            "ate_estimate": -0.20727173506626104,
+            "cee": 0.03527173506626105,
+            "ate_alignment_score": 0.7949317728705753
+          },
+          "doubly_robust": {
+            "ate_estimate": -0.19600206334382478,
+            "cee": 0.024002063343824792,
+            "ate_alignment_score": 0.860453120094042
+          }
+        },
+        "confounding_bias_magnitude": 0.3208310333077775,
+        "causal_consistency_index": 0.9473623942713932,
+        "counterfactual_prediction_accuracy": 1.0
+      },
+      "confounding": {
+        "observational_effect": 0.1263310333077775,
+        "causal_effect": -0.1945,
+        "bias": 0.3208310333077775,
+        "relative_bias_pct": -164.95168807597815
+      },
+      "cate_subgroups": [
+        {
+          "domain": "acs",
+          "age_group": "age_low",
+          "severity_group": "sev_low",
+          "true_cate": -0.040796911598549986,
+          "estimated_cate": -0.05809043386918818,
+          "n_obs": 1623
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_low",
+          "severity_group": "sev_mid",
+          "true_cate": -0.19223602042703308,
+          "estimated_cate": -0.21978037067301104,
+          "n_obs": 666
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_low",
+          "severity_group": "sev_high",
+          "true_cate": -0.28656392264962616,
+          "estimated_cate": -0.29418091027420495,
+          "n_obs": 382
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_mid",
+          "severity_group": "sev_low",
+          "true_cate": -0.09230168650458506,
+          "estimated_cate": -0.11936820702907666,
+          "n_obs": 887
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_mid",
+          "severity_group": "sev_mid",
+          "true_cate": -0.25196718946986046,
+          "estimated_cate": -0.2518440167516396,
+          "n_obs": 865
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_mid",
+          "severity_group": "sev_high",
+          "true_cate": -0.3170303486330574,
+          "estimated_cate": -0.33468280720005317,
+          "n_obs": 810
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_high",
+          "severity_group": "sev_low",
+          "true_cate": -0.20796830484330486,
+          "estimated_cate": -0.15531046443275648,
+          "n_obs": 341
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_high",
+          "severity_group": "sev_mid",
+          "true_cate": -0.2692339441967971,
+          "estimated_cate": -0.3177576993493195,
+          "n_obs": 661
+        },
+        {
+          "domain": "acs",
+          "age_group": "age_high",
+          "severity_group": "sev_high",
+          "true_cate": -0.24035879820600892,
+          "estimated_cate": -0.21853223300674207,
+          "n_obs": 1765
+        }
+      ],
+      "cate_true_range": [
+        -0.3170303486330574,
+        -0.040796911598549986
+      ],
+      "sensitivity": {
+        "risk_ratio": 1.4263791554357592,
+        "e_value": 2.206237052507957
+      }
+    }
+  }
+}
