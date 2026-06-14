@@ -95,3 +95,31 @@ python figures/generate_figures.py
 ```
 
 Licensed under the MIT License (see `LICENSE`).
+
+## Portfolio Relationship
+
+| Repository | Role |
+|---|---|
+| BASICS-CDSS | Beyond-accuracy evaluation methodology |
+| TRI-X | Framework-level package |
+| ORASR | Routing and safety-action component |
+| DRAS-5 | Dynamic risk-state component |
+| SAFE-Gate | Safety-gated ensemble framework |
+| SynDX | Synthetic validation and explainability evidence |
+| SURgul | SRGL/governance reproducibility component |
+| TRI-X-CDSS | Integration and implementation package |
+| Selective-CDSS | Risk-controlled selective-prediction (abstention) component |
+| Causal-CDSS | Causal-inference evaluation component |
+| Beyond-Accuracy | Simulation-based safety/calibration evaluation framework |
+
+## Contact
+
+**Chatchai Tritham**  
+Department of Computer Science and Information Technology, Faculty of Science, Naresuan University, Phitsanulok 65000, Thailand  
+Email: chatchait66@nu.ac.th  
+ORCID: 0000-0001-7899-228X
+
+**Chakkrit Snae Namahoot**  
+Department of Computer Science and Information Technology, Faculty of Science, Naresuan University, Phitsanulok 65000, Thailand  
+Email: chakkrits@nu.ac.th  
+ORCID: 0000-0003-4660-4590
