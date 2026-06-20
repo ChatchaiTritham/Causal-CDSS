@@ -52,6 +52,7 @@ from basics_cdss.causal.confounding import sensitivity_analysis_evalue
 SEED = 42
 N_OBS = 8000          # observational cohort size per domain
 N_INT = 8000          # interventional samples per arm for do-calculus
+N_BOOT = 1000         # bootstrap resamples for estimator 95% CIs (seed-derived)
 OUT = Path(__file__).parent / "results"
 
 
@@ -198,6 +199,36 @@ def doubly_robust_ate(data, treatment, outcome, confounders):
     return float(np.mean(dr1 - dr0))
 
 
+def bootstrap_ci(data, treatment, outcome, confounders, n_boot=N_BOOT,
+                 seed=SEED, level=0.95):
+    """Nonparametric bootstrap 95% CI for each ATE estimator.
+
+    Resamples the observational cohort with replacement (seeded for
+    reproducibility) and re-estimates the naive, backdoor-regression and
+    doubly-robust ATEs on each draw. Returns the percentile interval per
+    estimator. Used to put confidence intervals on the forest plot; the CI
+    bounds are NOT hardcoded -- they are recomputed here from seed 42.
+    """
+    rng = np.random.default_rng(seed)
+    n = len(data)
+    alpha = 1.0 - level
+    draws = {"naive": [], "backdoor_regression": [], "doubly_robust": []}
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, size=n)
+        samp = data.iloc[idx]
+        draws["naive"].append(naive_ate(samp, treatment, outcome))
+        draws["backdoor_regression"].append(
+            float(backdoor_adjustment(samp, treatment, outcome, confounders)["ate"]))
+        draws["doubly_robust"].append(
+            doubly_robust_ate(samp, treatment, outcome, confounders))
+    ci = {}
+    for name, vals in draws.items():
+        lo, hi = np.percentile(vals, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+        ci[name] = {"ci_low": float(lo), "ci_high": float(hi),
+                    "se": float(np.std(vals, ddof=1))}
+    return ci
+
+
 # --------------------------------------------------------------------------- #
 # Per-domain analysis.
 # --------------------------------------------------------------------------- #
@@ -230,6 +261,9 @@ def analyse_domain(name, cfg):
         ),
         "doubly_robust": doubly_robust_ate(obs, treatment, outcome, est_confounders),
     }
+
+    # Bootstrap 95% CIs for each estimator (seeded; for the forest plot).
+    est_ci = bootstrap_ci(obs, treatment, outcome, est_confounders)
 
     # Interventional reference data for the confounding-bias metric.
     int1 = scm_int.do_intervention({treatment: 1}, n=N_INT)
@@ -329,6 +363,7 @@ def analyse_domain(name, cfg):
         "true_ate": true_ate,
         "adjustment_set_identified": conf["confounders"],
         "estimators": est,
+        "estimator_ci": est_ci,
         "causal_metrics": {
             "per_estimator": metrics_per_estimator,
             "confounding_bias_magnitude": confounding_bias_magnitude,
@@ -383,14 +418,23 @@ def main():
         w = csv.writer(f)
         w.writerow(["domain", "label", "true_ate", "naive_ate",
                     "backdoor_ate", "doubly_robust_ate",
-                    "confounding_bias", "relative_bias_pct"])
+                    "confounding_bias", "relative_bias_pct",
+                    "naive_ci_low", "naive_ci_high",
+                    "backdoor_ci_low", "backdoor_ci_high",
+                    "doubly_robust_ci_low", "doubly_robust_ci_high"])
         for name, r in results["domains"].items():
+            ci = r["estimator_ci"]
             w.writerow([name, r["label"], f"{r['true_ate']:.4f}",
                         f"{r['estimators']['naive']:.4f}",
                         f"{r['estimators']['backdoor_regression']:.4f}",
                         f"{r['estimators']['doubly_robust']:.4f}",
                         f"{r['confounding']['bias']:.4f}",
-                        f"{r['confounding']['relative_bias_pct']:.2f}"])
+                        f"{r['confounding']['relative_bias_pct']:.2f}",
+                        f"{ci['naive']['ci_low']:.4f}", f"{ci['naive']['ci_high']:.4f}",
+                        f"{ci['backdoor_regression']['ci_low']:.4f}",
+                        f"{ci['backdoor_regression']['ci_high']:.4f}",
+                        f"{ci['doubly_robust']['ci_low']:.4f}",
+                        f"{ci['doubly_robust']['ci_high']:.4f}"])
     print("[OK] results/ate_by_domain.csv")
 
     # --- CSV: causal metrics per estimator ---------------------------------- #

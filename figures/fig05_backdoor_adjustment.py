@@ -19,8 +19,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Circle
 from matplotlib.lines import Line2D
 
-from pub_style import (apply_pub_style, save_fig, results_dir, PALETTE,
-                       C_TREATMENT, C_OUTCOME, C_CONFOUNDER, C_MEDIATOR)
+from pubviz import (apply_pub_style, save_fig, results_dir, PALETTE,
+                    C_TREATMENT, C_OUTCOME, C_CONFOUNDER, C_MEDIATOR)
 
 apply_pub_style()
 
@@ -209,5 +209,5 @@ fig.suptitle('Backdoor Criterion: Identifying and Blocking Confounding Paths (Se
              fontsize=12, fontweight='bold')
 
 OUT = __import__("pathlib").Path(__file__).resolve().parent
-save_fig(fig, OUT, 'fig05_backdoor_adjustment')
+save_fig(fig, 'fig05_backdoor_adjustment', OUT)
 plt.close(fig)

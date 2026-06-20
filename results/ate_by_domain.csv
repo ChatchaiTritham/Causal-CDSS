@@ -1,4 +1,4 @@
-domain,label,true_ate,naive_ate,backdoor_ate,doubly_robust_ate,confounding_bias,relative_bias_pct
-sepsis,Sepsis - Early Antibiotics,-0.1489,0.0985,-0.1704,-0.1624,0.2790,-154.57
-ards,ARDS - Low Tidal Volume,-0.1131,0.0614,-0.1275,-0.1274,0.2047,-142.88
-acs,ACS - Early Reperfusion,-0.1720,0.1263,-0.2073,-0.1960,0.3208,-164.95
+domain,label,true_ate,naive_ate,backdoor_ate,doubly_robust_ate,confounding_bias,relative_bias_pct,naive_ci_low,naive_ci_high,backdoor_ci_low,backdoor_ci_high,doubly_robust_ci_low,doubly_robust_ci_high
+sepsis,Sepsis - Early Antibiotics,-0.1489,0.0985,-0.1704,-0.1624,0.2790,-154.57,0.0774,0.1197,-0.1923,-0.1483,-0.1833,-0.1421
+ards,ARDS - Low Tidal Volume,-0.1131,0.0614,-0.1275,-0.1274,0.2047,-142.88,0.0405,0.0833,-0.1485,-0.1051,-0.1466,-0.1064
+acs,ACS - Early Reperfusion,-0.1720,0.1263,-0.2073,-0.1960,0.3208,-164.95,0.1055,0.1479,-0.2293,-0.1850,-0.2185,-0.1734

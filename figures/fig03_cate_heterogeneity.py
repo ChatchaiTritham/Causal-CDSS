@@ -17,7 +17,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-from pub_style import apply_pub_style, save_fig, results_dir, PALETTE
+from pubviz import apply_pub_style, save_fig, results_dir, PALETTE
 
 apply_pub_style()
 
@@ -90,11 +90,9 @@ for i in range(3):          # severity row
 lo = float(min(true_flat.min(), est_flat.min())) - 2
 hi = float(max(true_flat.max(), est_flat.max())) + 2
 diag = np.array([lo, hi])
-ax2.plot(diag, diag, "--", color="#555555", lw=1.2, alpha=0.7,
-         label="Perfect agreement")
+ax2.plot(diag, diag, "--", color="#555555", lw=1.2, alpha=0.7)
 xs = np.linspace(lo, hi, 100)
-ax2.plot(xs, slope * xs + intercept, color=PALETTE[1], lw=2.0,
-         label=f"OLS fit (slope = {slope:.2f})")
+ax2.plot(xs, slope * xs + intercept, color=PALETTE[1], lw=2.0)
 
 ax2.set_xlim(lo, hi); ax2.set_ylim(lo, hi)
 ax2.set_aspect("equal")
@@ -111,7 +109,8 @@ sev_handles = [plt.Line2D([0], [0], marker="o", color="w",
                                  ["qSOFA 0–1 (Low)", "qSOFA 2 (Moderate)", "qSOFA 3 (High)"])]
 fit_handles = [plt.Line2D([0], [0], ls="--", color="#555555", lw=1.2,
                           label="Perfect agreement"),
-               plt.Line2D([0], [0], color=PALETTE[1], lw=2.0, label="OLS fit")]
+               plt.Line2D([0], [0], color=PALETTE[1], lw=2.0,
+                          label=f"OLS fit (slope = {slope:.2f})")]
 ax2.legend(handles=sev_handles + fit_handles, fontsize=8, loc="upper left")
 
 ax2.text(0.97, 0.05, f"r = {r_val:.2f},  slope = {slope:.2f}",
@@ -123,6 +122,6 @@ fig.suptitle("Conditional Average Treatment Effect (CATE) Heterogeneity — "
              "Sepsis Antibiotic Timing", fontsize=12, fontweight="bold")
 
 OUT = __import__("pathlib").Path(__file__).resolve().parent
-save_fig(fig, OUT, "fig03_cate_heterogeneity")
+save_fig(fig, "fig03_cate_heterogeneity", OUT)
 plt.close(fig)
 print(f"  (empirical r={r_val:.3f}, slope={slope:.3f})")

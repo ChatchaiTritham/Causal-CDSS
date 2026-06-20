@@ -8,7 +8,7 @@ Batch driver: render all five publication-quality figures for
 
 Each figure is produced by its own standalone script (fig01..fig05). Every
 script:
-  * applies the canonical Top-Tier style from figures/pub_style.py
+  * applies the canonical Top-Tier style from figures/pubviz.py
     (Okabe-Ito colour-blind-safe palette, Times serif, 300 dpi, spines off),
   * loads ALL numeric data from results/ at run time (NOTHING is hardcoded;
     the data-bearing panels read the CSVs written by run_all.py at seed 42),
@@ -42,7 +42,7 @@ SCRIPTS = [
 
 
 def main():
-    # ensure the standalone scripts can import pub_style and run from anywhere
+    # ensure the standalone scripts can import pubviz and run from anywhere
     sys.path.insert(0, str(HERE))
     cwd0 = Path.cwd()
     import os

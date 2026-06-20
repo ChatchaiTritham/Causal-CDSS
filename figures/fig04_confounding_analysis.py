@@ -5,7 +5,9 @@ KAIS Causal Models for CDSS — Springer submission
 
 Per domain, compares the naive estimate, the two adjusted estimators
 (backdoor regression, doubly-robust) and the do-calculus truth, and annotates
-the confounding-bias magnitude (observational minus causal effect).
+the confounding-bias magnitude (observational minus causal effect). Domains are
+ordered by the true ATE (most protective truth first) so the figure reads with a
+clear visual hierarchy against the causal baseline.
 
 Data source: results/ate_by_domain.csv (written by run_all.py, seed 42).
 Values stored on probability scale, shown in percentage points (x100).
@@ -16,12 +18,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pub_style import apply_pub_style, save_fig, results_dir, PALETTE
+from pubviz import apply_pub_style, save_fig, results_dir, PALETTE
 
 apply_pub_style()
 
 # ---------- Load data ----------
 df = pd.read_csv(results_dir() / "ate_by_domain.csv")
+
+# Order domains by the truth baseline (ascending true_ate => strongest
+# protective effect first) for a consistent visual hierarchy.
+df = df.sort_values("true_ate").reset_index(drop=True)
 
 domains = [lbl.replace(" - ", "\n(").rstrip() + ")" for lbl in df["label"]]
 
@@ -65,7 +71,7 @@ ax.set_xticklabels(domains)
 ax.set_ylabel("Change in mortality probability (percentage points)")
 ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=4, fontsize=8.5)
 ax.set_title("Confounding Bias: Naive vs. Adjusted vs. Causal Estimates\n"
-             "Across Three Critical Care Domains",
+             "Across Three Critical Care Domains (ordered by true ATE)",
              fontsize=12, fontweight="bold")
 
 # data-driven caption summary (range of relative bias)
@@ -77,5 +83,5 @@ ax.text(0.01, -0.28,
         transform=ax.transAxes, fontsize=8, color="#6B7280", style="italic")
 
 OUT = __import__("pathlib").Path(__file__).resolve().parent
-save_fig(fig, OUT, "fig04_confounding_analysis")
+save_fig(fig, "fig04_confounding_analysis", OUT)
 plt.close(fig)
