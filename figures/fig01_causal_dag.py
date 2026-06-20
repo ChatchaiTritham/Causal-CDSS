@@ -12,7 +12,7 @@ Node shapes: rectangle=treatment, double-circle=outcome, circle=confounder/media
 Arrow styles: solid blue=causal, dashed orange=confounding (backdoor)
 
 This is a structural schematic (no numeric data); it shares the canonical
-publication palette/fonts from figures/pub_style.py so it matches every other
+publication palette/fonts from figures/pubviz.py so it matches every other
 figure in the portfolio.
 """
 
@@ -20,8 +20,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Circle
 from matplotlib.lines import Line2D
 
-from pub_style import (apply_pub_style, save_fig,
-                       C_TREATMENT, C_OUTCOME, C_CONFOUNDER, C_MEDIATOR)
+from pubviz import (apply_pub_style, save_fig,
+                    C_TREATMENT, C_OUTCOME, C_CONFOUNDER, C_MEDIATOR)
 
 apply_pub_style()
 
@@ -188,5 +188,5 @@ fig.suptitle('Causal Directed Acyclic Graphs (DAGs) for Three Critical Care Trea
              fontsize=13, fontweight='bold')
 
 OUT = __import__('pathlib').Path(__file__).resolve().parent
-save_fig(fig, OUT, 'fig01_causal_dag')
+save_fig(fig, 'fig01_causal_dag', OUT)
 plt.close(fig)
