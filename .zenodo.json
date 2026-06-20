@@ -1,0 +1,29 @@
+{
+  "title": "Causal-CDSS: Structural Causal Models for Evaluating Clinical Decision Support Systems",
+  "description": "A seeded, reproducible reference implementation of a causal-inference framework for evaluating clinical decision support systems (CDSS). Structural causal models for three critical-care domains (sepsis, ARDS, ACS) generate synthetic observational cohorts in which disease severity confounds treatment selection; the code recovers ground-truth average and conditional treatment effects via do-calculus and estimates them with naive, backdoor, and doubly-robust estimators, scoring five causal-evaluation metrics. A second driver compares five CDSS architectures (LR, RF, XGBoost, LSTM, TCN) on 10,000 simulated trajectories per domain. All data are synthetic with known effects; this is a methodological proof of concept, not a clinical validation.",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Tritham, Chatchai",
+      "affiliation": "Naresuan University",
+      "orcid": "0000-0001-7899-228X"
+    },
+    {
+      "name": "Snae Namahoot, Chakkrit",
+      "affiliation": "Naresuan University",
+      "orcid": "0000-0003-4660-4590"
+    }
+  ],
+  "keywords": [
+    "clinical decision support systems",
+    "causal inference",
+    "structural causal models",
+    "treatment effect estimation",
+    "confounding",
+    "healthcare AI",
+    "doubly-robust estimation",
+    "reproducibility"
+  ],
+  "access_right": "open"
+}

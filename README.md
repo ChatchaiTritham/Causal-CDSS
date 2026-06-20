@@ -44,6 +44,8 @@ Causal-CDSS/
 ## Installation
 
 ```bash
+git clone https://github.com/ChatchaiTritham/Causal-CDSS.git
+cd Causal-CDSS
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e .            # installs requirements + the vendored basics_cdss package
 ```
