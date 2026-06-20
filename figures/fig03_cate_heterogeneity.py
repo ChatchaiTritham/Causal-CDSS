@@ -3,121 +3,126 @@
 Figure 3: CATE Heterogeneity — Heatmap + Scatter Plot
 KAIS Causal Models for CDSS — Springer submission
 
-Left panel (A): Heatmap of true CATE across severity × age subgroups.
-Right panel (B): XGBoost-estimated vs true CATE scatter (9 subgroups).
-Data derived from Table 3 and figure caption values.
+Left panel (A): heatmap of true CATE across severity x age subgroups (sepsis).
+Right panel (B): estimated vs true CATE scatter for the 9 subgroups, with the
+                 empirical Pearson r and OLS slope computed from the data.
+
+Data source: results/cate_subgroups.csv (written by run_all.py, seed 42).
+CATE stored on probability scale, shown in percentage points (x100).
+NOTHING is hardcoded — r, slope and every cell come from the CSV.
 """
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from scipy import stats
 
-# ---------- True CATE (3 severity × 3 age) ----------
-# Rows: qSOFA 0-1, qSOFA 2, qSOFA 3
-# Cols: Age <50, Age 50-70, Age >70
-true_cate = np.array([
-    [-4.3,  -6.3,  -8.2],
-    [-9.8, -13.8, -16.5],
-    [-13.5, -17.8, -21.8],
-])
+from pub_style import apply_pub_style, save_fig, results_dir, PALETTE
 
-severity_labels = ['qSOFA 0–1\n(Low risk)', 'qSOFA 2\n(Moderate risk)', 'qSOFA 3\n(High risk)']
-age_labels = ['Age < 50', 'Age 50–70', 'Age > 70']
+apply_pub_style()
 
-# ---------- XGBoost estimates (slope ≈ 0.63, r ≈ 0.74) ----------
-# Systematic compression with realistic scatter to achieve r ≈ 0.74
-np.random.seed(42)
-true_flat = true_cate.flatten()
-# Larger noise to reduce correlation from ~1.0 to ~0.74
-noise = np.array([4.0, -3.5, 2.0, -4.2, 3.5, -1.2, 5.0, -3.0, 2.2])
-xgb_flat = 0.63 * true_flat - 1.5 + noise
+DOMAIN = "sepsis"          # figure illustrates the sepsis CATE surface
+AGE_ORDER = ["age_low", "age_mid", "age_high"]
+SEV_ORDER = ["sev_low", "sev_mid", "sev_high"]
+AGE_LABELS = ["Age < 50", "Age 50–70", "Age > 70"]
+SEV_LABELS = ["qSOFA 0–1\n(Low risk)", "qSOFA 2\n(Moderate risk)", "qSOFA 3\n(High risk)"]
 
-# Verify correlation
-r_val, _ = stats.pearsonr(true_flat, xgb_flat)
-slope_val, intercept, _, _, _ = stats.linregress(true_flat, xgb_flat)
+# ---------- Load data ----------
+df = pd.read_csv(results_dir() / "cate_subgroups.csv")
+d = df[df["domain"] == DOMAIN].copy()
 
-# Severity coloring for scatter
-severity_colors = ['#85C1E9', '#3498DB', '#1A5276']
-severity_names = ['qSOFA 0–1 (Low)', 'qSOFA 2 (Moderate)', 'qSOFA 3 (High)']
+# build 3x3 grids (rows=severity, cols=age) in percentage points
+true_grid = np.full((3, 3), np.nan)
+est_grid = np.full((3, 3), np.nan)
+for _, r in d.iterrows():
+    i = SEV_ORDER.index(r["severity_group"])
+    j = AGE_ORDER.index(r["age_group"])
+    true_grid[i, j] = r["true_cate"] * 100.0
+    est_grid[i, j] = r["estimated_cate"] * 100.0
 
-# ---------- Build figure ----------
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), dpi=300,
-                                gridspec_kw={'width_ratios': [1, 1.05]})
-fig.suptitle(
-    'Conditional Average Treatment Effect (CATE) Heterogeneity — Sepsis Antibiotic Timing',
-    fontsize=12.5, fontweight='bold', y=0.98
-)
+true_flat = true_grid.flatten()
+est_flat = est_grid.flatten()
 
-# ===== Panel A: Heatmap =====
-cmap = plt.cm.Blues
-norm = mcolors.Normalize(vmin=-25, vmax=-3)
+# empirical fit (computed, not asserted)
+r_val = float(np.corrcoef(true_flat, est_flat)[0, 1])
+slope, intercept = np.polyfit(true_flat, est_flat, 1)
 
-im = ax1.imshow(true_cate, cmap=cmap, norm=norm, aspect='auto')
+# ---------- Figure ----------
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5.2),
+                               gridspec_kw={"width_ratios": [1, 1.05]})
 
-# Annotate each cell
+# ===== Panel A: heatmap =====
+ax1.grid(False)
+vmin, vmax = np.nanmin(true_grid), np.nanmax(true_grid)
+cmap = mcolors.LinearSegmentedColormap.from_list(
+    "cate", ["#DEEBF7", "#9ECAE1", PALETTE[0], "#08306B"], N=256)
+im = ax1.imshow(true_grid, cmap=cmap, aspect="auto",
+                vmin=vmin, vmax=vmax)
+
+mid = (vmin + vmax) / 2
 for i in range(3):
     for j in range(3):
-        val = true_cate[i, j]
-        text_color = 'white' if val < -12 else '#1A3C6E'
-        ax1.text(j, i, f'{val:.1f}%', ha='center', va='center',
-                 fontsize=12, fontweight='bold', color=text_color)
+        val = true_grid[i, j]
+        tc = "white" if val < mid else "#08306B"
+        ax1.text(j, i, f"{val:.1f}%", ha="center", va="center",
+                 fontsize=11, fontweight="bold", color=tc)
 
-ax1.set_xticks([0, 1, 2])
-ax1.set_xticklabels(age_labels, fontsize=9.5)
-ax1.set_yticks([0, 1, 2])
-ax1.set_yticklabels(severity_labels, fontsize=9.5)
-ax1.set_title('(A)  True CATE by Severity × Age\n(Sepsis: Early Antibiotics <3 h vs. Delayed)',
-              fontsize=10, fontweight='bold', pad=10)
+ax1.set_xticks(range(3)); ax1.set_xticklabels(AGE_LABELS)
+ax1.set_yticks(range(3)); ax1.set_yticklabels(SEV_LABELS)
+ax1.tick_params(length=0)
+for s in ax1.spines.values():
+    s.set_visible(False)
+ax1.set_title("(A)  True CATE by Severity × Age\n"
+              "(Sepsis: Early Antibiotics <3 h vs. Delayed)",
+              fontsize=10.5, fontweight="bold")
+cbar = fig.colorbar(im, ax=ax1, shrink=0.82, pad=0.03)
+cbar.set_label("CATE: change in mortality probability (pp)")
+cbar.ax.tick_params(labelsize=8)
 
-# Colorbar
-cbar = fig.colorbar(im, ax=ax1, shrink=0.8, pad=0.03)
-cbar.set_label('CATE: Mortality Reduction (%)', fontsize=9)
-cbar.ax.tick_params(labelsize=8.5)
+# ===== Panel B: scatter =====
+ax2.set_facecolor("#FCFCFD")
+sev_colors = [PALETTE[5], PALETTE[0], "#08306B"]   # low / mid / high severity
+for i in range(3):          # severity row
+    for j in range(3):      # age col
+        ax2.scatter(true_grid[i, j], est_grid[i, j], color=sev_colors[i],
+                    s=95, edgecolors="white", linewidths=0.8, zorder=4)
 
-# ===== Panel B: Scatter Plot =====
-for sev_idx in range(3):
-    for age_idx in range(3):
-        flat_idx = sev_idx * 3 + age_idx
-        ax2.scatter(true_flat[flat_idx], xgb_flat[flat_idx],
-                    c=severity_colors[sev_idx], s=100, edgecolors='white',
-                    linewidths=0.8, zorder=3)
+lo = float(min(true_flat.min(), est_flat.min())) - 2
+hi = float(max(true_flat.max(), est_flat.max())) + 2
+diag = np.array([lo, hi])
+ax2.plot(diag, diag, "--", color="#555555", lw=1.2, alpha=0.7,
+         label="Perfect agreement")
+xs = np.linspace(lo, hi, 100)
+ax2.plot(xs, slope * xs + intercept, color=PALETTE[1], lw=2.0,
+         label=f"OLS fit (slope = {slope:.2f})")
 
-# Diagonal (perfect agreement)
-diag_range = np.array([-25, -3])
-ax2.plot(diag_range, diag_range, 'k--', linewidth=1, alpha=0.4, label='Perfect agreement')
+ax2.set_xlim(lo, hi); ax2.set_ylim(lo, hi)
+ax2.set_aspect("equal")
+ax2.set_xlabel("True CATE (pp)")
+ax2.set_ylabel("Estimated CATE (pp)")
+ax2.set_title("(B)  Estimated vs. True CATE\n(9 Subgroups: 3 Severity × 3 Age Groups)",
+              fontsize=10.5, fontweight="bold")
 
-# Regression line
-x_fit = np.linspace(-23, -3, 100)
-y_fit = slope_val * x_fit + intercept
-ax2.plot(x_fit, y_fit, color='#2980B9', linewidth=2.2, zorder=2, label='XGBoost fit')
+# severity legend handles
+sev_handles = [plt.Line2D([0], [0], marker="o", color="w",
+                          markerfacecolor=c, markeredgecolor="white",
+                          markersize=9, label=lbl)
+               for c, lbl in zip(sev_colors,
+                                 ["qSOFA 0–1 (Low)", "qSOFA 2 (Moderate)", "qSOFA 3 (High)"])]
+fit_handles = [plt.Line2D([0], [0], ls="--", color="#555555", lw=1.2,
+                          label="Perfect agreement"),
+               plt.Line2D([0], [0], color=PALETTE[1], lw=2.0, label="OLS fit")]
+ax2.legend(handles=sev_handles + fit_handles, fontsize=8, loc="upper left")
 
-# Legend for severity groups
-for idx, (col, name) in enumerate(zip(severity_colors, severity_names)):
-    ax2.scatter([], [], c=col, s=80, edgecolors='white', linewidths=0.6, label=name)
-ax2.legend(fontsize=7.5, loc='upper left', framealpha=0.9, edgecolor='#CCCCCC')
+ax2.text(0.97, 0.05, f"r = {r_val:.2f},  slope = {slope:.2f}",
+         transform=ax2.transAxes, fontsize=9, ha="right", va="bottom",
+         bbox=dict(boxstyle="round,pad=0.4", facecolor="white",
+                   edgecolor=PALETTE[0], alpha=0.95))
 
-ax2.set_xlabel('True CATE (mortality reduction, %)', fontsize=9.5)
-ax2.set_ylabel('XGBoost-estimated CATE (%)', fontsize=9.5)
-ax2.set_xlim(-23.5, -2.5)
-ax2.set_ylim(-23.5, -2.5)
-ax2.set_aspect('equal')
-ax2.tick_params(labelsize=9)
-ax2.spines['top'].set_visible(False)
-ax2.spines['right'].set_visible(False)
-ax2.set_title(f'(B)  XGBoost CATE Estimates vs. True CATE\n(9 Subgroups: 3 Severity × 3 Age Groups)',
-              fontsize=10, fontweight='bold', pad=10)
+fig.suptitle("Conditional Average Treatment Effect (CATE) Heterogeneity — "
+             "Sepsis Antibiotic Timing", fontsize=12, fontweight="bold")
 
-# Annotation box for r and slope
-textstr = f'r = {r_val:.2f},  slope = {slope_val:.2f}\n(systematic underestimation)'
-props = dict(boxstyle='round,pad=0.5', facecolor='#D6EAF8', edgecolor='#85C1E9', alpha=0.9)
-ax2.text(0.97, 0.06, textstr, transform=ax2.transAxes, fontsize=8.5,
-         ha='right', va='bottom', bbox=props)
-
-plt.tight_layout(rect=[0, 0, 1, 0.94])
-plt.savefig('fig03_cate_heterogeneity.png', dpi=300, bbox_inches='tight',
-            facecolor='white', edgecolor='none')
-plt.savefig('fig03_cate_heterogeneity.pdf', dpi=300, bbox_inches='tight',
-            facecolor='white', edgecolor='none')
-print(f"Saved: fig03_cate_heterogeneity.png / .pdf  (r={r_val:.3f}, slope={slope_val:.3f})")
-plt.close()
+OUT = __import__("pathlib").Path(__file__).resolve().parent
+save_fig(fig, OUT, "fig03_cate_heterogeneity")
+plt.close(fig)
+print(f"  (empirical r={r_val:.3f}, slope={slope:.3f})")
