@@ -78,6 +78,6 @@ methodology, not a clinical validation. No patient data and no IRB review apply.
 
 ## Data and code availability
 
-Source code is in this repository under the MIT License (see `LICENSE`). A tagged
-GitHub release can be archived to Zenodo for a citable DOI; see
-`ZENODO_RELEASE.md`.
+Source code is in this repository under the MIT License (see `LICENSE`). A
+permanent, citable archival snapshot of the released code will be provided upon
+acceptance.
