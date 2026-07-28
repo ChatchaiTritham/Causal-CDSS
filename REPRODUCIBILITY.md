@@ -8,7 +8,8 @@ figure or table scripts.
 ## Environment
 
 - Python 3.10+
-- Dependencies pinned in `requirements.txt`
+- The complete numerical environment is pinned in `requirements.txt`; PyTorch
+  is mandatory for the manuscript model-comparison driver.
 - Install in editable mode: `pip install -e .`
 
 ## Two experiments, two drivers
@@ -44,6 +45,9 @@ in all three domains.)
 python scripts/model_comparison.py    # seed 42
 ```
 
+The driver fails closed if PyTorch is unavailable. It never writes manuscript
+evidence from the labelled NumPy proxy implementation.
+
 - Cohort size: **10,000 trajectories per domain** (`N_PATIENTS = 10000`),
   6 timesteps each — this is the "10,000 trajectories" experiment reported in the
   manuscript abstract and Table "Associational vs. causal performance".
@@ -53,7 +57,7 @@ python scripts/model_comparison.py    # seed 42
 
 Headline values produced (seed 42): mean associational accuracy 74.7%
 (AUROC ~0.81), naive causal accuracy 0% for every architecture, adjusted causal
-accuracy mean 84.6% (LSTM 96.4%, TCN 96.3%, LR 94.1%, XGBoost 89.0%, RF 47.2%).
+accuracy mean 84.9% (TCN 98.4%, LSTM 96.4%, LR 94.1%, XGBoost 88.4%, RF 47.2%).
 
 ## Determinism notes
 

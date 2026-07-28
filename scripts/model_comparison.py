@@ -449,6 +449,13 @@ def build_model(kind, n_feat):
 
 
 def main():
+    if not HAVE_TORCH:
+        raise RuntimeError(
+            "PyTorch is required for the manuscript reproduction. "
+            "Install the declared dependencies with `pip install -r "
+            "requirements.txt`; proxy sequence models are not permitted to "
+            "write submission evidence."
+        )
     _set_global_determinism(SEED)
     OUT.mkdir(parents=True, exist_ok=True)
     print(f"[*] Associational-vs-causal model comparison  (seed={SEED})")

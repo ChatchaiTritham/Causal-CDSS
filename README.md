@@ -22,7 +22,14 @@ All figures below are written by `run_all.py` at seed 42, from an 8,000-patient 
 - Subgroup CATE varies several-fold: for sepsis the true effect ranges from −0.053 (young, low-severity) to −0.307 (young, high-severity), and the estimated CATE tracks it with a Causal Consistency Index (true-vs-estimated correlation) of 0.74–0.95 across domains.
 - Counterfactual sign accuracy is 1.00 in all three domains, and the E-value sensitivity sits between 1.59 (ARDS) and 2.21 (ACS).
 
-**Relationship to the manuscript.** The headline tables in the paper come from a different and larger experiment — five trained CDSS models (LR, RF, XGBoost, LSTM, TCN) scored on a digital-twin simulator with clinically labelled confounders — so the paper's per-intervention numbers (for instance, sepsis early-antibiotics true ATE −0.152, naive −0.035, adjusted −0.148) are not the quantities this script regenerates. What this repository reproduces is the underlying causal mechanism and the metric definitions: the same direction of confounding, the same sign reversal in the naive estimate, ATE-alignment behaviour, CATE heterogeneity, and the E-value sensitivity. Treat the values above as the reproducible evidence; treat the paper's tables as the reported study they illustrate. The two are consistent in pattern, not byte-for-byte in magnitude.
+**Relationship to the manuscript.** The repository contains both experiments
+reported in the paper. `run_all.py` regenerates the domain-level SCM,
+intervention, subgroup, and sensitivity analyses. The separate
+`scripts/model_comparison.py` driver trains LR, RF, XGBoost, LSTM, and TCN on
+10,000 trajectories per domain and regenerates the associational-versus-causal
+table used in the abstract and main results. The numerical environment is fully
+pinned in `requirements.txt`; the model-comparison driver fails closed rather
+than writing submission evidence from its labelled proxy if PyTorch is absent.
 
 ## Repository structure
 

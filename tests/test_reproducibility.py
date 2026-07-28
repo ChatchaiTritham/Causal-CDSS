@@ -46,34 +46,34 @@ ATE_BY_DOMAIN = RESULTS / "ate_by_domain.csv"
 MODELS = ["LR", "RF", "XGBoost", "LSTM", "TCN"]
 
 # --------------------------------------------------------------------------- #
-# Committed reference values (read from results/ on 2026-06-20). These are the
-# verified, deterministic seed-42 numbers; tests assert the artifacts still
-# match them and that a live re-run reproduces them.
+# Committed reference values regenerated on 2026-07-27 with the fully pinned
+# environment in requirements.txt. Tests assert both artifact integrity and a
+# live seed-42 reproduction.
 # --------------------------------------------------------------------------- #
 EXPECTED_ASSOC_ACC = {
     "LR": 0.7486,
     "RF": 0.7457,
-    "XGBoost": 0.7429,
-    "LSTM": 0.7492,
-    "TCN": 0.7474,
+    "XGBoost": 0.7437,
+    "LSTM": 0.7493,
+    "TCN": 0.7459,
 }
 EXPECTED_ADJ_ACC = {
     "LR": 0.9409,
     "RF": 0.4717,
-    "XGBoost": 0.8901,
+    "XGBoost": 0.8838,
     "LSTM": 0.9643,
-    "TCN": 0.9625,
+    "TCN": 0.9838,
 }
 EXPECTED_NAIVE_ATE = {  # all POSITIVE -> sign-flipped vs the protective truth
     "LR": 0.1580,
     "RF": 0.1986,
-    "XGBoost": 0.1622,
+    "XGBoost": 0.1641,
     "LSTM": 0.1570,
     "TCN": 0.1506,
 }
 TRUE_ATE = -0.1425          # negative (protective); same for every model row
-MEAN_ASSOC_ACC = 0.7468
-MEAN_ADJ_ACC = 0.8459
+MEAN_ASSOC_ACC = 0.7466
+MEAN_ADJ_ACC = 0.8489
 
 # per-domain (results/ate_by_domain.csv): true ATE < 0, naive ATE > 0
 EXPECTED_DOMAIN_ATE = {
