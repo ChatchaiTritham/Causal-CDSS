@@ -118,3 +118,20 @@ Released under the MIT License (see `LICENSE`).
 | Selective-CDSS | Risk-controlled selective-prediction (abstention) component |
 | Causal-CDSS | Causal-inference evaluation component |
 | Beyond-Accuracy | Simulation-based safety/calibration evaluation framework |
+
+## Relationship to our other repositories
+
+The package under `src/basics_cdss/` is shared infrastructure: the same modules appear in
+several of our repositories covering complementary aspects of clinical decision support
+evaluation. Sharing it keeps one implementation of the common metric and simulation code
+rather than four divergent copies.
+
+What belongs to **this** study is the driver, the computed results and the figures:
+
+- `run_all.py` — causal-mechanism driver
+- `scripts/model_comparison.py` — architecture-comparison driver
+- `results/` — the computed metric tables
+- `figures/` — the figures and their generators
+
+Anything under `src/basics_cdss/` that this study does not exercise is inherited from the
+shared package and is not part of the results reported here.
