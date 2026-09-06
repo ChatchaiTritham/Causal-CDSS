@@ -1,56 +1,44 @@
 #!/usr/bin/env python3
+"""Figure 1: the 4-node causal DAG actually declared in run_all.py build_scm().
+
+Nodes: age, severity, treatment, outcome.
+Edges: age->severity, age->outcome, severity->treatment, severity->outcome,
+       treatment->outcome.
+Minimal backdoor adjustment set: {severity}.
+Panels differ only in the clinical reading of T (and the coefficients, Table S2).
 """
-Figure 1: Causal Directed Acyclic Graphs (DAGs) for Three Critical Care Domains
-KAIS Causal Models for CDSS — Springer submission
+import sys
+from pathlib import Path
 
-Three-panel SCM schematic for:
-  (A) Sepsis — Antibiotic Timing
-  (B) ARDS — Ventilation Strategy
-  (C) ACS — Reperfusion Timing
-
-Node shapes: rectangle=treatment, double-circle=outcome, circle=confounder/mediator
-Arrow styles: solid blue=causal, dashed orange=confounding (backdoor)
-
-This is a structural schematic (no numeric data); it shares the canonical
-publication palette/fonts from figures/pubviz.py so it matches every other
-figure in the portfolio.
-"""
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parent
+sys.path.insert(0, str(HERE))
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Circle
 from matplotlib.lines import Line2D
-
-from pubviz import (apply_pub_style, save_fig,
-                    C_TREATMENT, C_OUTCOME, C_CONFOUNDER, C_MEDIATOR)
+from pubviz import apply_pub_style, C_TREATMENT, C_OUTCOME, C_CONFOUNDER, C_NEUTRAL
 
 apply_pub_style()
-
-# ─── Palette (semantic, drawn from the Okabe-Ito canon) ───
-COL_TREAT   = C_TREATMENT      # treatment edge/fill (blue)
-COL_OUTCOME = C_OUTCOME        # outcome (vermillion)
-COL_CONF    = C_CONFOUNDER     # confounder (orange)
-COL_MED     = C_MEDIATOR       # mediator (bluish green)
-COL_CAUSAL  = C_TREATMENT      # causal arrows (blue)
-COL_CONFND  = C_CONFOUNDER     # confounding arrows (orange, dashed)
+COL_TREAT, COL_OUT, COL_CONF = C_TREATMENT, C_OUTCOME, C_CONFOUNDER
+COL_CAUSAL, COL_CONFND = C_TREATMENT, C_CONFOUNDER
 
 
-def _lighten(hex_color, f=0.55):
-    """Blend a hex colour toward white for soft node fills."""
-    r = int(hex_color[1:3], 16); g = int(hex_color[3:5], 16); b = int(hex_color[5:7], 16)
+def _lighten(h, f=0.55):
+    r, g, b = int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)
     r = int(r + (255 - r) * f); g = int(g + (255 - g) * f); b = int(b + (255 - b) * f)
     return f"#{r:02X}{g:02X}{b:02X}"
 
 
-def draw_rect(ax, cx, cy, w, h, text, edge, fontsize=8.5):
-    box = FancyBboxPatch((cx - w / 2, cy - h / 2), w, h,
-                         boxstyle="round,pad=0.06", facecolor=_lighten(edge),
-                         edgecolor=edge, linewidth=1.6, zorder=4)
-    ax.add_patch(box)
-    ax.text(cx, cy, text, ha='center', va='center', fontsize=fontsize,
-            fontweight='bold', color='#1F2937', zorder=5)
+def draw_rect(ax, cx, cy, w, h, text, edge, fs=8.5):
+    ax.add_patch(FancyBboxPatch((cx - w / 2, cy - h / 2), w, h,
+                                boxstyle="round,pad=0.06", facecolor=_lighten(edge),
+                                edgecolor=edge, linewidth=1.6, zorder=4))
+    ax.text(cx, cy, text, ha='center', va='center', fontsize=fs,
+            fontweight='bold', color='#1F2937', zorder=5, linespacing=1.15)
 
 
-def draw_circle(ax, cx, cy, r, text, edge, fontsize=8, double=False):
+def draw_circle(ax, cx, cy, r, text, edge, fs=8, double=False):
     fill = _lighten(edge)
     if double:
         ax.add_patch(Circle((cx, cy), r * 1.15, facecolor=fill, edgecolor=edge,
@@ -60,133 +48,100 @@ def draw_circle(ax, cx, cy, r, text, edge, fontsize=8, double=False):
     else:
         ax.add_patch(Circle((cx, cy), r, facecolor=fill, edgecolor=edge,
                             linewidth=1.4, zorder=4))
-    ax.text(cx, cy, text, ha='center', va='center', fontsize=fontsize,
+    ax.text(cx, cy, text, ha='center', va='center', fontsize=fs,
             fontweight='bold', color='#1F2937', zorder=5, linespacing=1.15)
 
 
-def draw_arrow(ax, x1, y1, x2, y2, color, dashed=False, lw=1.8):
-    arrow = FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='->',
-                            mutation_scale=14, color=color, linewidth=lw,
-                            connectionstyle='arc3,rad=0.08', zorder=3)
+def draw_arrow(ax, x1, y1, x2, y2, color, dashed=False, lw=1.8, rad=0.08):
+    a = FancyArrowPatch((x1, y1), (x2, y2), arrowstyle='->', mutation_scale=14,
+                        color=color, linewidth=lw,
+                        connectionstyle=f'arc3,rad={rad}', zorder=3)
     if dashed:
-        arrow.set_linestyle((0, (6, 3)))
-    ax.add_patch(arrow)
+        a.set_linestyle((0, (6, 3)))
+    ax.add_patch(a)
 
 
-# ─── Figure layout (constrained_layout from rcParams) ───
-fig, axes = plt.subplots(1, 3, figsize=(15, 5.2))
+fig, axes = plt.subplots(1, 3, figsize=(15, 5.0))
 fig.patch.set_facecolor('white')
 
-titles = [
-    '(A)  Sepsis: Antibiotic Timing',
-    '(B)  ARDS: Ventilation Strategy',
-    '(C)  ACS: Reperfusion Timing',
-]
-annotations = [
-    'T = Early Antibiotics (<3 h)   |   Y = 28-day Mortality',
-    'T = Low Tidal Volume (6 mL/kg)   |   Y = Ventilator-Free Days',
-    'T = Door-to-Balloon (<90 min)   |   Y = 30-day MACE',
-]
-
-dags = [
-    {   # SEPSIS
-        'T':  {'pos': (1.2, 4.5), 'label': 'Early\nAntibiotics', 'w': 1.8, 'h': 0.9},
-        'M':  {'pos': (4.5, 4.5), 'label': 'Pathogen\nClearance', 'r': 0.72},
-        'Y':  {'pos': (8.0, 4.5), 'label': '28-day\nMortality', 'r': 0.78},
-        'Z': [
-            {'pos': (2.0, 8.0), 'label': 'SOFA\nScore',     'r': 0.65},
-            {'pos': (4.8, 8.0), 'label': 'Age',              'r': 0.52},
-            {'pos': (1.5, 1.2), 'label': 'Comor-\nbidity',   'r': 0.62},
-            {'pos': (4.5, 1.2), 'label': 'Infection\nSource', 'r': 0.62},
-        ],
-    },
-    {   # ARDS
-        'T':  {'pos': (1.2, 4.5), 'label': 'Low Tidal\nVolume', 'w': 1.8, 'h': 0.9},
-        'M':  {'pos': (4.5, 4.5), 'label': 'Alveolar\nRecruitment', 'r': 0.72},
-        'Y':  {'pos': (8.0, 4.5), 'label': 'Ventilator-\nFree Days', 'r': 0.78},
-        'Z': [
-            {'pos': (2.2, 8.0), 'label': 'P/F\nRatio',        'r': 0.58},
-            {'pos': (5.0, 8.0), 'label': 'Baseline\nSeverity', 'r': 0.62},
-            {'pos': (2.8, 1.2), 'label': 'ARDS\nAetiology',    'r': 0.62},
-        ],
-    },
-    {   # ACS
-        'T':  {'pos': (1.2, 4.5), 'label': 'Time-to-\nReperfusion', 'w': 1.8, 'h': 0.9},
-        'M':  {'pos': (4.5, 4.5), 'label': 'Infarct\nSize', 'r': 0.68},
-        'Y':  {'pos': (8.0, 4.5), 'label': '30-day\nMortality', 'r': 0.78},
-        'Z': [
-            {'pos': (2.0, 8.0), 'label': 'Symptom\nDuration', 'r': 0.62},
-            {'pos': (5.2, 8.0), 'label': 'Infarct\nTerritory', 'r': 0.62},
-            {'pos': (2.8, 1.2), 'label': 'Killip\nClass',      'r': 0.58},
-        ],
-    },
+panels = [
+    ('(A)  Sepsis: Early Antibiotics',
+     'Early\nAntibiotics',
+     'T = early antibiotic administration   |   Y = in-hospital mortality (binary)'),
+    ('(B)  ARDS: Low Tidal Volume',
+     'Low Tidal\nVolume',
+     'T = low tidal volume ventilation   |   Y = in-hospital mortality (binary)'),
+    ('(C)  ACS: Early Reperfusion',
+     'Early\nReperfusion',
+     'T = early reperfusion   |   Y = in-hospital mortality (binary)'),
 ]
 
-for ax, dag, title, ann in zip(axes, dags, titles, annotations):
-    ax.set_xlim(-0.5, 10.2)
-    ax.set_ylim(-0.8, 10.0)
+# node geometry (shared by all three panels)
+AGE = (1.6, 8.0, 0.62)
+SEV = (4.6, 6.6, 0.80)
+T_POS = (2.2, 3.0, 1.9, 0.95)
+Y_POS = (7.6, 3.0, 0.85)
+
+for ax, (title, tlabel, ann) in zip(axes, panels):
+    ax.set_xlim(-0.3, 9.6)
+    ax.set_ylim(0.2, 10.0)
     ax.set_aspect('equal')
     ax.axis('off')
+    ax.text(4.7, 9.8, title, ha='center', va='top', fontsize=11.5, fontweight='bold')
 
-    ax.text(4.8, 9.6, title, ha='center', va='top', fontsize=11.5,
-            fontweight='bold')
+    draw_circle(ax, AGE[0], AGE[1], AGE[2], 'Age', COL_CONF, fs=8)
+    draw_circle(ax, SEV[0], SEV[1], SEV[2], 'Severity', COL_CONF, fs=8)
+    draw_rect(ax, T_POS[0], T_POS[1], T_POS[2], T_POS[3], tlabel, COL_TREAT)
+    draw_circle(ax, Y_POS[0], Y_POS[1], Y_POS[2], 'Mortality', COL_OUT, fs=8, double=True)
 
-    T = dag['T']
-    draw_rect(ax, *T['pos'], T['w'], T['h'], T['label'], COL_TREAT, fontsize=8.5)
-    M = dag['M']
-    draw_circle(ax, *M['pos'], M['r'], M['label'], COL_MED, fontsize=8)
-    Y = dag['Y']
-    draw_circle(ax, *Y['pos'], Y['r'], Y['label'], COL_OUTCOME, fontsize=8, double=True)
-    for z in dag['Z']:
-        draw_circle(ax, *z['pos'], z['r'], z['label'], COL_CONF, fontsize=7.5)
+    ax_, ay_, ar_ = AGE
+    sx, sy, sr = SEV
+    tx, ty, tw, th = T_POS
+    yx, yy, yr = Y_POS
 
-    tx, ty = T['pos']; mx, my = M['pos']; yx, yy = Y['pos']
-    draw_arrow(ax, tx + T['w'] / 2 + 0.1, ty, mx - M['r'] - 0.08, my, COL_CAUSAL)
-    draw_arrow(ax, mx + M['r'] + 0.08, my, yx - Y['r'] * 1.15 - 0.08, yy, COL_CAUSAL)
+    # age -> severity (causal, within the confounding structure)
+    draw_arrow(ax, ax_ + ar_ * 0.8, ay_ - ar_ * 0.5, sx - sr - 0.05, sy + sr * 0.4,
+               COL_CONFND, dashed=True, lw=1.4)
+    # severity -> treatment (backdoor)
+    draw_arrow(ax, sx - sr * 0.7, sy - sr - 0.05, tx + tw * 0.25, ty + th / 2 + 0.05,
+               COL_CONFND, dashed=True, lw=1.4)
+    # severity -> outcome (backdoor)
+    draw_arrow(ax, sx + sr * 0.7, sy - sr - 0.05, yx - yr * 0.6, yy + yr * 1.15 + 0.05,
+               COL_CONFND, dashed=True, lw=1.4)
+    # age -> outcome
+    draw_arrow(ax, ax_ + ar_ * 0.5, ay_ + ar_ * 0.6, yx + yr * 0.4, yy + yr * 1.35,
+               COL_CONFND, dashed=True, lw=1.4, rad=-0.32)
+    # treatment -> outcome (the causal effect of interest)
+    draw_arrow(ax, tx + tw / 2 + 0.08, ty, yx - yr * 1.15 - 0.08, yy, COL_CAUSAL, lw=2.2)
 
-    for z in dag['Z']:
-        zx, zy = z['pos']; zr = z['r']
-        if zy > ty:
-            draw_arrow(ax, zx, zy - zr - 0.05, tx + T['w'] / 4, ty + T['h'] / 2 + 0.05,
-                       COL_CONFND, dashed=True, lw=1.3)
-        else:
-            draw_arrow(ax, zx, zy + zr + 0.05, tx + T['w'] / 4, ty - T['h'] / 2 - 0.05,
-                       COL_CONFND, dashed=True, lw=1.3)
-        if zy > yy:
-            draw_arrow(ax, zx + zr * 0.5, zy - zr - 0.05, yx - Y['r'] * 0.5,
-                       yy + Y['r'] * 1.15 + 0.05, COL_CONFND, dashed=True, lw=1.3)
-        else:
-            draw_arrow(ax, zx + zr * 0.5, zy + zr + 0.05, yx - Y['r'] * 0.5,
-                       yy - Y['r'] * 1.15 - 0.05, COL_CONFND, dashed=True, lw=1.3)
-
-    ax.text(4.8, -0.5, ann, ha='center', va='top', fontsize=7.5,
+    ax.text(4.9, 1.35, ann, ha='center', va='top', fontsize=7.5,
             fontstyle='italic', color='#6B7280')
+    ax.text(4.9, 0.75, r'Minimal backdoor adjustment set  Z = {Severity}',
+            ha='center', va='top', fontsize=7.5, color=C_NEUTRAL)
 
-# ─── Legend (below all panels) ───
 legend_handles = [
     FancyBboxPatch((0, 0), 0.18, 0.10, boxstyle="round,pad=0.02",
                    facecolor=_lighten(COL_TREAT), edgecolor=COL_TREAT, lw=1.2),
-    Circle((0, 0), 0.06, facecolor=_lighten(COL_OUTCOME), edgecolor=COL_OUTCOME, lw=1.2),
+    Circle((0, 0), 0.06, facecolor=_lighten(COL_OUT), edgecolor=COL_OUT, lw=1.2),
     Circle((0, 0), 0.06, facecolor=_lighten(COL_CONF), edgecolor=COL_CONF, lw=1.2),
-    Circle((0, 0), 0.06, facecolor=_lighten(COL_MED), edgecolor=COL_MED, lw=1.2),
-    Line2D([0], [0], color=COL_CAUSAL, lw=2.0, ls='-'),
+    Line2D([0], [0], color=COL_CAUSAL, lw=2.2, ls='-'),
     Line2D([0], [0], color=COL_CONFND, lw=1.5, ls='--'),
 ]
 legend_labels = [
     'Treatment (T) — rectangle',
     'Outcome (Y) — double circle',
-    'Confounder (Z) — circle',
-    'Mediator (M) — circle',
-    'Causal path',
+    'Baseline covariate — circle',
+    'Treatment effect path',
     'Backdoor (confounding) path',
 ]
-fig.legend(legend_handles, legend_labels, loc='lower center', ncol=6, fontsize=8.5,
+fig.legend(legend_handles, legend_labels, loc='lower center', ncol=5, fontsize=8.5,
            frameon=False, handlelength=1.8, columnspacing=1.5,
            bbox_to_anchor=(0.5, -0.02))
-
-fig.suptitle('Causal Directed Acyclic Graphs (DAGs) for Three Critical Care Treatment Pathways',
+fig.suptitle('Causal DAG for the Three Critical Care Treatment Domains '
+             '(identical structure, domain-specific coefficients)',
              fontsize=13, fontweight='bold')
 
-OUT = __import__('pathlib').Path(__file__).resolve().parent
-save_fig(fig, 'fig01_causal_dag', OUT)
+for ext in ("pdf", "png"):
+    fig.savefig(HERE / f"fig01_causal_dag.{ext}", bbox_inches="tight", facecolor="white")
 plt.close(fig)
+print("ok")
