@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Causal-CDSS: Structural Causal Models for Clinical Decision Support Evaluation"
+abstract: >-
+  A seeded demonstration that a confounded ICU cohort can flip the sign of a
+  treatment effect, and that backdoor adjustment and doubly-robust estimation
+  recover it. The repository contains the reference implementation, a
+  deterministic seed-42 driver that regenerates every reported estimate to
+  committed CSVs, and the figure generators.
+type: software
+authors:
+  - given-names: Chatchai
+    family-names: Tritham
+    email: chatchait66@nu.ac.th
+    orcid: "https://orcid.org/0000-0001-7899-228X"
+    affiliation: >-
+      Department of Computer Science and Information Technology, Faculty of
+      Science, Naresuan University, Phitsanulok 65000, Thailand
+  - given-names: Chakkrit Snae
+    family-names: Namahoot
+    email: chakkrits@nu.ac.th
+    orcid: "https://orcid.org/0000-0003-4660-4590"
+    affiliation: >-
+      Department of Computer Science and Information Technology, Faculty of
+      Science, Naresuan University, Phitsanulok 65000, Thailand
+license: MIT
+repository-code: "https://github.com/ChatchaiTritham/Causal-CDSS"
+version: 1.0.0
+keywords:
+  - clinical decision support systems
+  - structural causal models
+  - confounding
+  - backdoor adjustment
+  - doubly robust estimation
+  - treatment effect estimation
