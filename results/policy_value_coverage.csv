@@ -1,0 +1,13 @@
+domain,policy,dr_ci95_coverage,nominal,mean_ess_fraction,mean_policy_agreement,mean_max_weight_share,reps
+sepsis,treat_all,0.005,0.95,0.1539,0.4453,0.00599,200
+sepsis,treat_none,0.005,0.95,0.2901,0.5547,0.00612,200
+sepsis,cdss_top50,0.9,0.95,0.6512,0.6816,0.0004,200
+sepsis,cdss_top25,0.345,0.95,0.6367,0.6721,0.00045,200
+ards,treat_all,0.03,0.95,0.2556,0.459,0.00606,200
+ards,treat_none,0.065,0.95,0.4094,0.541,0.00489,200
+ards,cdss_top50,0.965,0.95,0.6183,0.6391,0.00036,200
+ards,cdss_top25,0.61,0.95,0.6072,0.6315,0.00039,200
+cardiac,treat_all,0.015,0.95,0.1255,0.4337,0.00612,200
+cardiac,treat_none,0.0,0.95,0.2541,0.5663,0.00621,200
+cardiac,cdss_top50,0.91,0.95,0.6746,0.7111,0.00042,200
+cardiac,cdss_top25,0.315,0.95,0.661,0.7022,0.00046,200

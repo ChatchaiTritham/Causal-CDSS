@@ -85,3 +85,24 @@ methodology, not a clinical validation. No patient data and no IRB review apply.
 Source code is in this repository under the MIT License (see `LICENSE`). A
 permanent, citable archival snapshot of the released code will be provided upon
 acceptance.
+
+## Identification without the simulated confounder (added 2026-10-04)
+
+`run_all.py` adjusts for the confounder it simulates, which verifies the implementation but
+not the evaluation practice. `scripts/unmeasured_confounding.py` removes that convenience:
+
+- **Proximal identification.** Severity is hidden and replaced by a negative-control exposure
+  and a negative-control outcome (Miao et al., 2018; Tchetgen Tchetgen et al., 2024). Backdoor
+  adjustment on the recorded covariates then carries a bias of 0.134-0.184 in absolute
+  mortality, of the wrong sign in sepsis and ARDS, while proximal two-stage least squares stays
+  within 0.016 of the interventional truth (200 replications, n = 8,000).
+- **Off-policy evaluation.** The CDSS is evaluated as a policy: IPW, self-normalised IPW and
+  doubly-robust value estimates against the true value under `do(A = pi(x))`, with effective
+  sample size and policy-agreement diagnostics. Interval coverage is 0.925 for a policy that
+  agrees with recorded practice two thirds of the time and below 0.03 for treat-all or
+  treat-none.
+
+Outputs: `results/proximal_estimates.csv`, `results/policy_value_estimates.csv`,
+`results/policy_value_coverage.csv`; figures from `scripts/make_unmeasured_figures.py`.
+
+Reproduce with: `python scripts/unmeasured_confounding.py --reps 200 --n 8000`
