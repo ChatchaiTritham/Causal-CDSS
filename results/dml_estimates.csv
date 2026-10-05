@@ -1,7 +1,7 @@
 domain,adjustment_set,true_ate,mean_estimate,bias,ci95_coverage,reps,n
-sepsis,oracle_severity_recorded,-0.1614,-0.184,-0.0225,0.35,20,8000
-sepsis,recorded_only,-0.1614,-0.1121,0.0493,0.0,20,8000
-ards,oracle_severity_recorded,-0.1177,-0.1271,-0.0094,0.75,20,8000
-ards,recorded_only,-0.1177,-0.0726,0.0451,0.05,20,8000
-cardiac,oracle_severity_recorded,-0.1875,-0.2209,-0.0334,0.1,20,8000
-cardiac,recorded_only,-0.1875,-0.1431,0.0445,0.05,20,8000
+sepsis,oracle_severity_recorded,-0.1614,-0.1824,-0.021,0.5,20,8000
+sepsis,recorded_only,-0.1614,-0.1133,0.0481,0.0,20,8000
+ards,oracle_severity_recorded,-0.1177,-0.1231,-0.0054,0.9,20,8000
+ards,recorded_only,-0.1177,-0.0678,0.0499,0.0,20,8000
+cardiac,oracle_severity_recorded,-0.1875,-0.2242,-0.0367,0.0,20,8000
+cardiac,recorded_only,-0.1875,-0.1485,0.039,0.05,20,8000

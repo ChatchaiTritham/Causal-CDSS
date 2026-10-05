@@ -14,6 +14,14 @@ Three experiments:
    proximal stops being the better choice -- is reported, because that, rather than the
    gamma = 0 result, is what tells an analyst when to use it.
 
+1b. **Second-assumption sweep.** Proximal identification needs two exclusion restrictions,
+   not one: Z must not act on the outcome except through treatment (experiment 1), and the
+   negative-control outcome W must not be affected by the treatment. The second is the easier
+   one to violate in a real audit, because any proxy measured after the treatment decision --
+   a later lab value, a discharge code, a follow-up note -- is downstream of it. Here W is
+   given a direct treatment effect of size delta, swept over the same range, and the bias is
+   again traced against the backdoor comparator.
+
 2. **Double machine learning.** Cross-fitted DML (Chernozhukov et al., 2018) is run on the same
    data, both in the oracle case where severity is recorded and in the realistic case where it
    is not, so the reader can see which part of the error is estimation and which is
@@ -24,8 +32,8 @@ Three experiments:
    added). A specification that is wrong in a way the data can see should fail more of its
    implied tests -- this is what makes the DAG falsifiable rather than assumed.
 
-Outputs: results/proximal_robustness.csv, results/dml_estimates.csv,
-         results/dag_implication_tests.csv
+Outputs: results/proximal_robustness.csv, results/proximal_robustness_w.csv,
+         results/dml_estimates.csv, results/dag_implication_tests.csv
 
 Usage: python scripts/proximal_robustness.py [--reps 100] [--n 8000]
 """
@@ -69,6 +77,26 @@ def simulate_violated(cfg: dict, n: int, rng: np.random.Generator, gamma: float)
     a = (rng.uniform(0, 1, n) < pt).astype(float)
     py = sigmoid(cfg["sev_to_out"] * sev + cfg["age_to_out"] * age
                  + cfg["treat_to_out"] * a + gamma * z + cfg["out_intercept"])
+    y = (rng.uniform(0, 1, n) < py).astype(float)
+    return dict(age=age, severity=sev, z=z, w=w, a=a, y=y)
+
+
+def simulate_violated_w(cfg: dict, n: int, rng: np.random.Generator, delta: float) -> dict:
+    """Same generator, but the treatment now acts directly on the negative-control outcome W.
+
+    delta is the A -> W effect. delta = 0 satisfies the second proximal exclusion restriction;
+    anything else makes W a post-treatment variable, which is what a proxy drawn from records
+    written after the treatment decision would be. The true ATE is unaffected, because W is not
+    on any path into Y -- only the estimator's premises are broken.
+    """
+    age = rng.normal(0, 1, n)
+    sev = cfg["age_to_sev"] * age + rng.normal(0, 1, n)
+    z = cfg["sev_to_z"] * sev + rng.normal(0, 1, n)
+    pt = sigmoid(cfg["sev_to_treat"] * sev + cfg["treat_intercept"])
+    a = (rng.uniform(0, 1, n) < pt).astype(float)
+    w = cfg["sev_to_w"] * sev + delta * a + rng.normal(0, 1, n)
+    py = sigmoid(cfg["sev_to_out"] * sev + cfg["age_to_out"] * age
+                 + cfg["treat_to_out"] * a + cfg["out_intercept"])
     y = (rng.uniform(0, 1, n) < py).astype(float)
     return dict(age=age, severity=sev, z=z, w=w, a=a, y=y)
 
@@ -187,6 +215,35 @@ def main() -> None:
         w.writeheader()
         w.writerows(rows)
     print("wrote results/proximal_robustness.csv")
+
+    # ------------------------------------------------- 1b. second assumption: A -> W
+    wrows = []
+    for domain, cfg in DOMAINS.items():
+        truth = true_ate(cfg, 200_000, np.random.default_rng(args.seed + 7))
+        for delta in GAMMAS:
+            est = {"proximal": [], "backdoor_observed": []}
+            for r in range(args.reps):
+                rng = np.random.default_rng(args.seed + 211 * r + hash(domain) % 97)
+                d = simulate_violated_w(cfg, args.n, rng, delta)
+                est["proximal"].append(proximal_ate(d))
+                est["backdoor_observed"].append(backdoor_observed_ate(d))
+            for name, vals in est.items():
+                v = np.array(vals)
+                wrows.append({"domain": domain, "delta_a_to_w": delta, "estimator": name,
+                              "true_ate": round(truth, 4),
+                              "mean_estimate": round(float(v.mean()), 4),
+                              "bias": round(float(v.mean() - truth), 4),
+                              "abs_bias": round(abs(float(v.mean() - truth)), 4),
+                              "reps": args.reps, "n": args.n})
+            pr = [r for r in wrows if r["domain"] == domain and r["delta_a_to_w"] == delta]
+            print(f"  {domain:8} delta {delta:<5} "
+                  + "  ".join(f"{r['estimator']}: {r['abs_bias']:.3f}" for r in pr), flush=True)
+
+    with open(RESULTS / "proximal_robustness_w.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(wrows[0]))
+        w.writeheader()
+        w.writerows(wrows)
+    print("wrote results/proximal_robustness_w.csv")
 
     # ---------------------------------------------------------------- 2. DML
     dml_rows = []
