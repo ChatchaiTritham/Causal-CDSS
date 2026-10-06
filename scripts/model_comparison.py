@@ -20,7 +20,7 @@ SCM (seed 42, severity confounds treatment exactly as in run_all.py):
        It is scored against the KNOWN ground-truth ATE (see below).
 
   3. ADJUSTED causal-effect-estimation accuracy
-       the backdoor / intervention (T-learner) estimate -- the same model used
+       the backdoor / intervention (S-learner) estimate -- the same model used
        as an outcome model, flipping ONLY the treatment channel while the
        severity-derived vitals are held fixed (do(T)), so severity is adjusted
        for by construction:
@@ -45,7 +45,7 @@ HEADLINE GAP (apples-to-apples -- both terms are accuracies):
   estimate is poor (confounding bias). Recovery is shown by
   adjusted_causal_acc >> naive_causal_acc.
 
-Retained auxiliary causal columns (individual-level, T-learner path):
+Retained auxiliary causal columns (individual-level, S-learner path):
   CEE       Causal Effect Estimation Error = mean |tau_hat_adj - tau| on test
   ATE-Align fraction of test patients whose ADJUSTED estimated effect direction
             matches the true causal direction
@@ -207,7 +207,7 @@ def generate_domain(cfg, rng):
 # --------------------------------------------------------------------------- #
 # Model wrappers. Each exposes fit(seq, treat, y) and proba(seq, treat) so the
 # same object scores BOTH associational accuracy and causal effects (by
-# swapping the treatment channel -> T-learner intervention).
+# swapping the treatment channel -> S-learner intervention).
 # --------------------------------------------------------------------------- #
 def _flatten(seq):
     return seq.reshape(seq.shape[0], -1)
@@ -391,7 +391,7 @@ def score_model(model, tr, te):
         tau_hat_naive = float("nan")
     naive_causal_acc = _ate_accuracy(tau_hat_naive, true_ate)
 
-    # --- 3. ADJUSTED causal estimate (T-learner do-intervention) ----------- #
+    # --- 3. ADJUSTED causal estimate (S-learner do-intervention) ----------- #
     # Flip ONLY the treatment channel while severity-derived vitals are held
     # fixed => backdoor adjustment for severity by construction.
     seq1 = _seq_with_treatment(te["seq"], 1.0)

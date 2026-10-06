@@ -27,13 +27,32 @@ Three experiments:
    is not, so the reader can see which part of the error is estimation and which is
    identification. Nominal 95% interval coverage is reported over replications.
 
-3. **Testable implications of the DAG.** The graph implies conditional independencies; those are
+3. **Nonlinear severity.** Both the generator and the proximal bridge regressions are linear
+   in severity, so the method's advantage may come from that agreement rather than from
+   identification. Severity is given a quadratic term, then a threshold effect, then nonlinear
+   proxies, with the exclusion restrictions left intact, and the comparison with backdoor
+   adjustment is repeated in each regime.
+
+   The four regimes, with the exclusion restrictions left intact in all of them so that only
+   functional form changes:
+
+     linear      the published setting, carried as a reference column
+     quadratic   severity enters the outcome logit as sev + k*(sev^2 - 1)
+     threshold   severity acts through an indicator 1[sev > 0], a step the linear bridge
+                 regression cannot represent
+     proxy_nl    the proxies are recorded as flags rather than measurements -- a chart
+                 indicator for "deteriorating" instead of a lab value -- so the first-stage
+                 regression of W on (T, Z, age) is misspecified too and the proxy carries
+                 less information about severity
+
+4. **Testable implications of the DAG.** The graph implies conditional independencies; those are
    tested against the data for the true DAG and for perturbed DAGs (an edge deleted, an edge
    added). A specification that is wrong in a way the data can see should fail more of its
    implied tests -- this is what makes the DAG falsifiable rather than assumed.
 
 Outputs: results/proximal_robustness.csv, results/proximal_robustness_w.csv,
-         results/dml_estimates.csv, results/dag_implication_tests.csv
+         results/proximal_nonlinear.csv, results/dml_estimates.csv,
+         results/dag_implication_tests.csv
 
 Usage: python scripts/proximal_robustness.py [--reps 100] [--n 8000]
 """
@@ -106,6 +125,55 @@ def true_ate_violated(cfg: dict, n: int, rng: np.random.Generator, gamma: float)
     sev = cfg["age_to_sev"] * age + rng.normal(0, 1, n)
     z = cfg["sev_to_z"] * sev + rng.normal(0, 1, n)
     base = (cfg["sev_to_out"] * sev + cfg["age_to_out"] * age + gamma * z
+            + cfg["out_intercept"])
+    return float(np.mean(sigmoid(base + cfg["treat_to_out"]) - sigmoid(base)))
+
+
+REGIMES = ("linear", "quadratic", "threshold", "proxy_nl")
+CURVE = 0.6  # strength of the nonlinear severity term, on the outcome logit scale
+
+
+def _sev_effect(sev, regime: float | str):
+    """How severity enters the outcome logit under each regime."""
+    if regime == "quadratic":
+        return sev + CURVE * (sev ** 2 - 1.0)      # centred so the mean effect is comparable
+    if regime == "threshold":
+        return sev + CURVE * (sev > 0).astype(float)
+    return sev
+
+
+def simulate_nonlinear(cfg: dict, n: int, rng: np.random.Generator, regime: str) -> dict:
+    """Same causal structure, but severity need not act linearly.
+
+    The exclusion restrictions are untouched in every regime: Z still has no edge into the
+    outcome and W is still unaffected by treatment. What changes is the functional form, so a
+    difference in bias is attributable to misspecification of the bridge regressions alone.
+    """
+    age = rng.normal(0, 1, n)
+    sev = cfg["age_to_sev"] * age + rng.normal(0, 1, n)
+    if regime == "proxy_nl":
+        # proxies recorded as flags rather than measurements -- a chart indicator for
+        # "deteriorating" instead of a lab value. Monotone but badly nonlinear, and much
+        # closer to what an audit of real records actually holds than a continuous proxy.
+        z = (cfg["sev_to_z"] * (sev > 0.0).astype(float)
+             + 0.5 * rng.normal(0, 1, n))
+        w = (cfg["sev_to_w"] * (sev > -0.5).astype(float)
+             + 0.5 * rng.normal(0, 1, n))
+    else:
+        z = cfg["sev_to_z"] * sev + rng.normal(0, 1, n)
+        w = cfg["sev_to_w"] * sev + rng.normal(0, 1, n)
+    pt = sigmoid(cfg["sev_to_treat"] * sev + cfg["treat_intercept"])
+    a = (rng.uniform(0, 1, n) < pt).astype(float)
+    py = sigmoid(cfg["sev_to_out"] * _sev_effect(sev, regime) + cfg["age_to_out"] * age
+                 + cfg["treat_to_out"] * a + cfg["out_intercept"])
+    y = (rng.uniform(0, 1, n) < py).astype(float)
+    return dict(age=age, severity=sev, z=z, w=w, a=a, y=y)
+
+
+def true_ate_nonlinear(cfg: dict, n: int, rng: np.random.Generator, regime: str) -> float:
+    age = rng.normal(0, 1, n)
+    sev = cfg["age_to_sev"] * age + rng.normal(0, 1, n)
+    base = (cfg["sev_to_out"] * _sev_effect(sev, regime) + cfg["age_to_out"] * age
             + cfg["out_intercept"])
     return float(np.mean(sigmoid(base + cfg["treat_to_out"]) - sigmoid(base)))
 
@@ -244,6 +312,44 @@ def main() -> None:
         w.writeheader()
         w.writerows(wrows)
     print("wrote results/proximal_robustness_w.csv")
+
+    # ------------------------------------------------- 1c. nonlinear severity
+    nl_rows = []
+    for domain, cfg in DOMAINS.items():
+        for regime in REGIMES:
+            truth = true_ate_nonlinear(cfg, 200_000,
+                                       np.random.default_rng(args.seed + 13), regime)
+            est = {"proximal": [], "backdoor_observed": []}
+            for r in range(args.reps):
+                rng = np.random.default_rng(args.seed + 307 * r + hash(domain) % 97)
+                d = simulate_nonlinear(cfg, args.n, rng, regime)
+                est["proximal"].append(proximal_ate(d))
+                est["backdoor_observed"].append(backdoor_observed_ate(d))
+            for name, vals in est.items():
+                v = np.array(vals)
+                # MCSE is reported because a bias rounded to four decimals can print as
+                # 0.0000 while being merely small: without it a reader cannot tell an exact
+                # recovery from a lucky seed block, and in this regime it is the latter
+                mcse = float(v.std(ddof=1) / np.sqrt(len(v)))
+                nl_rows.append({"domain": domain, "regime": regime, "estimator": name,
+                                "true_ate": round(truth, 5),
+                                "mean_estimate": round(float(v.mean()), 5),
+                                "bias": round(float(v.mean() - truth), 5),
+                                "abs_bias": round(abs(float(v.mean() - truth)), 5),
+                                "mcse": round(mcse, 5),
+                                "reps": args.reps, "n": args.n})
+            pr = {r["estimator"]: r for r in nl_rows
+                  if r["domain"] == domain and r["regime"] == regime}
+            ratio = (pr["backdoor_observed"]["abs_bias"] / pr["proximal"]["abs_bias"]
+                     if pr["proximal"]["abs_bias"] > 0 else float("inf"))
+            print(f"  {domain:8} {regime:10} prox {pr['proximal']['abs_bias']:.3f}  "
+                  f"back {pr['backdoor_observed']['abs_bias']:.3f}  ratio {ratio:.2f}", flush=True)
+
+    with open(RESULTS / "proximal_nonlinear.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(nl_rows[0]))
+        w.writeheader()
+        w.writerows(nl_rows)
+    print("wrote results/proximal_nonlinear.csv")
 
     # ---------------------------------------------------------------- 2. DML
     dml_rows = []
