@@ -4,6 +4,10 @@ fig_proximal_bias.pdf  : estimator bias against the interventional ground truth,
                          when the confounder is unmeasured.
 fig_policy_overlap.pdf : doubly-robust interval coverage against the overlap the policy
                          leaves, across policies and domains.
+fig_proximal_dag.pdf   : the causal graph of the unmeasured-confounding design, with the two
+                         negative controls and the exclusion restrictions the sweeps violate.
+fig_proximal_sweeps.pdf: absolute bias of the proximal and backdoor estimators as each
+                         exclusion restriction is violated (Z -> Y and T -> W).
 """
 from __future__ import annotations
 
@@ -33,6 +37,8 @@ EST_STYLE = {"naive": ("#CC79A7", "Naive (unadjusted)"),
              "proximal": ("#009E73", "Proximal (negative controls)")}
 POL_STYLE = {"treat_all": ("#D55E00", "o"), "treat_none": ("#CC79A7", "s"),
              "cdss_top50": ("#0072B2", "^"), "cdss_top25": ("#009E73", "D")}
+NICE_POLICY = {"treat_all": "Treat all", "treat_none": "Treat none",
+               "cdss_top50": "CDSS, top 50%", "cdss_top25": "CDSS, top 25%"}
 
 
 def fig_bias() -> None:
@@ -44,7 +50,8 @@ def fig_bias() -> None:
         g = d[d.estimator == est].set_index("domain").loc[domains]
         xs = [i + (j - 1) * width for i in range(len(domains))]
         a.bar(xs, g.mean_estimate, width=width, color=col, edgecolor="black",
-              linewidth=0.4, label=lab)
+              linewidth=0.4, label=lab, yerr=1.96 * g.sd,
+              error_kw={"elinewidth": 0.6, "capsize": 1.5, "ecolor": "#333333"})
         b.bar(xs, g.abs_bias, width=width, color=col, edgecolor="black", linewidth=0.4)
     truth = d[d.estimator == "proximal"].set_index("domain").loc[domains, "true_ate"]
     a.plot(range(len(domains)), truth, "k_", markersize=26, markeredgewidth=1.4,
@@ -73,7 +80,7 @@ def fig_overlap() -> None:
     for pol, (col, mk) in POL_STYLE.items():
         g = m[m.policy == pol]
         a.scatter(g.mean_ess_fraction, g.dr_ci95_coverage, color=col, marker=mk, s=34,
-                  edgecolors="black", linewidths=0.4, label=pol.replace("_", " "))
+                  edgecolors="black", linewidths=0.4, label=NICE_POLICY[pol])
         b.scatter(g.mean_ess_fraction, g.dr_rmse, color=col, marker=mk, s=34,
                   edgecolors="black", linewidths=0.4)
     a.axhline(0.95, color="#4D4D4D", linestyle=(0, (1, 2)), linewidth=1.0)
@@ -96,6 +103,71 @@ def fig_overlap() -> None:
     print("wrote figures/fig_policy_overlap.pdf")
 
 
+def fig_dag() -> None:
+    """Graph of the unmeasured-confounding design; dashed red edges are the two restrictions."""
+    from matplotlib.patches import FancyArrowPatch
+    nodes = {"Age": (0.50, 0.92), "U": (0.50, 0.55), "Z": (0.09, 0.55),
+             "T": (0.22, 0.08), "Y": (0.78, 0.08), "W": (0.91, 0.55)}
+    label = {"Age": "Age", "U": "Severity $U$\n(unrecorded)",
+             "Z": "$Z$\nneg.-control\nexposure",
+             "T": "Treatment $T$", "Y": "Mortality $Y$",
+             "W": "$W$\nneg.-control\noutcome"}
+    fig, ax = plt.subplots(figsize=(5.2, 2.8))
+    ax.set_xlim(0, 1); ax.set_ylim(-0.04, 1.02); ax.axis("off")
+    for k, (x, y) in nodes.items():
+        dashed = k == "U"
+        ax.text(x, y, label[k], ha="center", va="center", fontsize=8,
+                bbox={"boxstyle": "round,pad=0.35", "fc": "#F2F2F2" if dashed else "white",
+                      "ec": "#333333", "lw": 0.7, "ls": "--" if dashed else "-"})
+
+    def edge(u, v, color="#333333", ls="-", rad=0.0, lw=0.9):
+        ax.add_patch(FancyArrowPatch(nodes[u], nodes[v], arrowstyle="-|>", mutation_scale=9,
+                                     color=color, lw=lw, ls=ls, shrinkA=22, shrinkB=22,
+                                     connectionstyle=f"arc3,rad={rad}"))
+    for u, v in [("Age", "U"), ("U", "T"), ("U", "Y"), ("U", "Z"), ("U", "W"),
+                 ]:
+        edge(u, v)
+    edge("Age", "Y", rad=-0.25)
+    edge("T", "Y", color="#0072B2", lw=1.6)
+    edge("Z", "Y", color="#D55E00", ls="--", rad=0.12)
+    edge("T", "W", color="#D55E00", ls="--", rad=0.12)
+    ax.text(0.27, 0.36, r"$\gamma$", color="#D55E00", fontsize=9)
+    ax.text(0.71, 0.36, r"$\delta$", color="#D55E00", fontsize=9)
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_proximal_dag.pdf", bbox_inches="tight")
+    fig.savefig(OUT / "fig_proximal_dag.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print("wrote figures/fig_proximal_dag.pdf")
+
+
+def fig_sweeps() -> None:
+    z = pd.read_csv(RES / "proximal_robustness.csv")
+    w = pd.read_csv(RES / "proximal_robustness_w.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(5.8, 2.6), sharey=True)
+    dom_col = {"sepsis": "#0072B2", "ards": "#009E73", "cardiac": "#D55E00"}
+    for ax, d, key, xl, tag in ((axes[0], z, "gamma_z_to_y", r"Direct effect $\gamma$ of $Z$ on $Y$", "(a)"),
+                                (axes[1], w, "delta_a_to_w", r"Direct effect $\delta$ of $T$ on $W$", "(b)")):
+        for dom, col in dom_col.items():
+            for est, ls, mk in (("proximal", "-", "o"), ("backdoor_observed", "--", "s")):
+                g = d[(d.domain == dom) & (d.estimator == est)].sort_values(key)
+                ax.plot(g[key], g.abs_bias, ls=ls, marker=mk, ms=3, lw=1.0, color=col)
+        ax.set_xlabel(xl)
+        ax.text(0.0, 1.04, tag, transform=ax.transAxes, fontweight="bold")
+    axes[0].set_ylabel("Absolute bias (mortality)")
+    from matplotlib.lines import Line2D
+    h = [Line2D([], [], color=c, lw=1.2, label=NICE_DOMAIN[k]) for k, c in dom_col.items()]
+    h += [Line2D([], [], color="black", ls="-", marker="o", ms=3, label="Proximal"),
+          Line2D([], [], color="black", ls="--", marker="s", ms=3, label="Backdoor on recorded")]
+    fig.legend(handles=h, loc="lower center", ncol=5, frameon=False, bbox_to_anchor=(0.5, -0.1))
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_proximal_sweeps.pdf", bbox_inches="tight")
+    fig.savefig(OUT / "fig_proximal_sweeps.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print("wrote figures/fig_proximal_sweeps.pdf")
+
+
 if __name__ == "__main__":
     fig_bias()
     fig_overlap()
+    fig_dag()
+    fig_sweeps()
