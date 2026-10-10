@@ -71,11 +71,12 @@ sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO))
 
 from scipy import stats  # noqa: E402
-from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor  # noqa: E402
+from sklearn.ensemble import (  # noqa: E402
+    HistGradientBoostingClassifier, HistGradientBoostingRegressor)
 from sklearn.model_selection import KFold  # noqa: E402
 
 from unmeasured_confounding import (  # noqa: E402
-    DOMAINS, backdoor_observed_ate, ols, proximal_ate, sigmoid, true_ate,
+    DOMAINS, backdoor_observed_ate, domain_offset, ols, proximal_ate, sigmoid, true_ate,
 )
 
 RESULTS = REPO / "results"
@@ -178,28 +179,44 @@ def true_ate_nonlinear(cfg: dict, n: int, rng: np.random.Generator, regime: str)
     return float(np.mean(sigmoid(base + cfg["treat_to_out"]) - sigmoid(base)))
 
 
-def dml_ate(d: dict, covariates: list[str], seed: int = 0, folds: int = 5) -> tuple[float, float]:
-    """Cross-fitted partially linear DML estimate of the ATE and its standard error.
+def dml_ate(d: dict, covariates: list[str], seed: int = 0, folds: int = 5,
+            score: str = "plr") -> tuple[float, float]:
+    """Cross-fitted DML estimate of the ATE and its standard error.
 
-    Nuisances (propensity and outcome regression) are gradient-boosted; the orthogonal score
-    is the usual residual-on-residual regression, so the estimate is not contaminated by
-    overfitting of either nuisance.
+    ``plr``  partially linear score (residual-on-residual); misspecified for a binary outcome
+             through a logistic link, kept as the comparator the first version reported.
+    ``aipw`` interactive / augmented-IPW score with arm-specific outcome models, which targets
+             the ATE without assuming a constant additive effect.
+    Nuisances are histogram gradient boosting, cross-fitted over ``folds`` folds.
     """
     X = np.column_stack([d[c] for c in covariates])
     a, y = d["a"], d["y"]
     n = len(y)
-    res_a, res_y = np.zeros(n), np.zeros(n)
     kf = KFold(n_splits=folds, shuffle=True, random_state=seed)
+    if score == "plr":
+        res_a, res_y = np.zeros(n), np.zeros(n)
+        for tr, te in kf.split(X):
+            m_a = HistGradientBoostingClassifier(random_state=seed).fit(X[tr], a[tr])
+            m_y = HistGradientBoostingRegressor(random_state=seed).fit(X[tr], y[tr])
+            res_a[te] = a[te] - m_a.predict_proba(X[te])[:, 1]
+            res_y[te] = y[te] - m_y.predict(X[te])
+        denom = float(np.sum(res_a ** 2))
+        theta = float(np.sum(res_a * res_y) / denom)
+        eps = res_y - theta * res_a
+        return theta, float(np.sqrt(np.sum((res_a * eps) ** 2)) / denom)
+    if score != "aipw":
+        raise ValueError(score)
+    psi = np.zeros(n)
     for tr, te in kf.split(X):
-        m_a = GradientBoostingClassifier(random_state=seed).fit(X[tr], a[tr])
-        m_y = GradientBoostingRegressor(random_state=seed).fit(X[tr], y[tr])
-        res_a[te] = a[te] - m_a.predict_proba(X[te])[:, 1]
-        res_y[te] = y[te] - m_y.predict(X[te])
-    denom = float(np.sum(res_a ** 2))
-    theta = float(np.sum(res_a * res_y) / denom) if denom > 0 else float("nan")
-    eps = res_y - theta * res_a
-    se = float(np.sqrt(np.sum((res_a * eps) ** 2)) / denom) if denom > 0 else float("nan")
-    return theta, se
+        e = HistGradientBoostingClassifier(random_state=seed).fit(X[tr], a[tr])
+        t1, t0 = tr[a[tr] == 1], tr[a[tr] == 0]
+        m1 = HistGradientBoostingClassifier(random_state=seed).fit(X[t1], y[t1])
+        m0 = HistGradientBoostingClassifier(random_state=seed).fit(X[t0], y[t0])
+        ps = np.clip(e.predict_proba(X[te])[:, 1], 0.01, 0.99)
+        mu1, mu0 = m1.predict_proba(X[te])[:, 1], m0.predict_proba(X[te])[:, 1]
+        psi[te] = (mu1 - mu0 + a[te] * (y[te] - mu1) / ps
+                   - (1 - a[te]) * (y[te] - mu0) / (1 - ps))
+    return float(psi.mean()), float(psi.std(ddof=1) / np.sqrt(n))
 
 
 def partial_corr_test(x: np.ndarray, y: np.ndarray, Z: np.ndarray | None) -> float:
@@ -246,6 +263,22 @@ def implied_independencies(graph: str) -> list[tuple[str, str, tuple[str, ...]]]
     raise ValueError(graph)
 
 
+def implied_independencies_recorded(graph: str) -> list[tuple[str, str, tuple[str, ...]]]:
+    """Implications of each candidate graph among the RECORDED variables only.
+
+    With severity latent it is a common parent of z, w, treatment and (in the true graph) the
+    outcome, so the true graph and the extra-edge graph imply no conditional independence among
+    {age, z, w, a, y}. The graph without severity -> outcome does: every path from a proxy to the
+    outcome then runs through treatment or age, so z and w are independent of y given (a, age).
+    That is the falsification still available to an audit that never recorded severity.
+    """
+    if graph == "missing_edge_sev_to_y":
+        return [("z", "y", ("a", "age")), ("w", "y", ("a", "age"))]
+    if graph in ("true", "extra_edge_age_to_a"):
+        return []
+    raise ValueError(graph)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="robustness of proximal identification")
     ap.add_argument("--reps", type=int, default=100)
@@ -262,7 +295,7 @@ def main() -> None:
                                       np.random.default_rng(args.seed + 7), gamma)
             est = {"proximal": [], "backdoor_observed": []}
             for r in range(args.reps):
-                rng = np.random.default_rng(args.seed + 131 * r + hash(domain) % 97)
+                rng = np.random.default_rng(args.seed + 131 * r + domain_offset(domain, 97))
                 d = simulate_violated(cfg, args.n, rng, gamma)
                 est["proximal"].append(proximal_ate(d))
                 est["backdoor_observed"].append(backdoor_observed_ate(d))
@@ -291,7 +324,7 @@ def main() -> None:
         for delta in GAMMAS:
             est = {"proximal": [], "backdoor_observed": []}
             for r in range(args.reps):
-                rng = np.random.default_rng(args.seed + 211 * r + hash(domain) % 97)
+                rng = np.random.default_rng(args.seed + 211 * r + domain_offset(domain, 97))
                 d = simulate_violated_w(cfg, args.n, rng, delta)
                 est["proximal"].append(proximal_ate(d))
                 est["backdoor_observed"].append(backdoor_observed_ate(d))
@@ -321,7 +354,7 @@ def main() -> None:
                                        np.random.default_rng(args.seed + 13), regime)
             est = {"proximal": [], "backdoor_observed": []}
             for r in range(args.reps):
-                rng = np.random.default_rng(args.seed + 307 * r + hash(domain) % 97)
+                rng = np.random.default_rng(args.seed + 307 * r + domain_offset(domain, 97))
                 d = simulate_nonlinear(cfg, args.n, rng, regime)
                 est["proximal"].append(proximal_ate(d))
                 est["backdoor_observed"].append(backdoor_observed_ate(d))
@@ -355,24 +388,26 @@ def main() -> None:
     dml_rows = []
     for domain, cfg in DOMAINS.items():
         truth = true_ate(cfg, 200_000, np.random.default_rng(args.seed + 999))
-        for label, covs in (("oracle_severity_recorded", ["age", "severity"]),
-                            ("recorded_only", ["age", "z", "w"])):
-            ests, covers = [], []
-            for r in range(max(args.reps // 5, 10)):
-                rng = np.random.default_rng(args.seed + 977 * r + hash(domain) % 89)
-                d = simulate_violated(cfg, args.n, rng, 0.0)
-                theta, se = dml_ate(d, covs, seed=r)
-                ests.append(theta)
-                covers.append(float(theta - 1.96 * se <= truth <= theta + 1.96 * se))
-            e = np.array(ests)
-            dml_rows.append({"domain": domain, "adjustment_set": label,
-                             "true_ate": round(truth, 4),
-                             "mean_estimate": round(float(e.mean()), 4),
-                             "bias": round(float(e.mean() - truth), 4),
-                             "ci95_coverage": round(float(np.mean(covers)), 3),
-                             "reps": len(ests), "n": args.n})
-            print(f"  DML {domain:8} {label:26} bias {dml_rows[-1]['bias']:+.4f} "
-                  f"coverage {dml_rows[-1]['ci95_coverage']}", flush=True)
+        for score in ("aipw", "plr"):
+            for label, covs in (("oracle_severity_recorded", ["age", "severity"]),
+                                ("recorded_only", ["age", "z", "w"])):
+                ests, covers = [], []
+                for r in range(args.reps):
+                    rng = np.random.default_rng(args.seed + 977 * r + domain_offset(domain, 89))
+                    d = simulate_violated(cfg, args.n, rng, 0.0)
+                    theta, se = dml_ate(d, covs, seed=r, score=score)
+                    ests.append(theta)
+                    covers.append(float(theta - 1.96 * se <= truth <= theta + 1.96 * se))
+                e = np.array(ests)
+                dml_rows.append({"domain": domain, "score": score, "adjustment_set": label,
+                                 "true_ate": round(truth, 4),
+                                 "mean_estimate": round(float(e.mean()), 4),
+                                 "bias": round(float(e.mean() - truth), 4),
+                                 "mcse_bias": round(float(e.std(ddof=1) / np.sqrt(len(e))), 4),
+                                 "ci95_coverage": round(float(np.mean(covers)), 3),
+                                 "reps": len(ests), "n": args.n})
+                print(f"  DML {domain:8} {score:4} {label:26} bias {dml_rows[-1]['bias']:+.4f} "
+                      f"coverage {dml_rows[-1]['ci95_coverage']}", flush=True)
     with open(RESULTS / "dml_estimates.csv", "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(dml_rows[0]))
         w.writeheader()
@@ -382,7 +417,7 @@ def main() -> None:
     # ---------------------------------------------------------------- 3. DAG implications
     dag_rows = []
     for domain, cfg in DOMAINS.items():
-        rng = np.random.default_rng(args.seed + hash(domain) % 83)
+        rng = np.random.default_rng(args.seed + domain_offset(domain, 83))
         d = simulate_violated(cfg, args.n, rng, 0.0)
         for graph in ("true", "missing_edge_sev_to_y", "extra_edge_age_to_a"):
             tests = implied_independencies(graph)
@@ -401,6 +436,23 @@ def main() -> None:
         w.writeheader()
         w.writerows(dag_rows)
     print("wrote results/dag_implication_tests.csv")
+
+    rec_rows = []
+    for domain, cfg in DOMAINS.items():
+        rng = np.random.default_rng(args.seed + domain_offset(domain, 83))
+        d = simulate_violated(cfg, args.n, rng, 0.0)
+        for graph in ("true", "missing_edge_sev_to_y", "extra_edge_age_to_a"):
+            for x, y, cond in implied_independencies_recorded(graph):
+                pv = partial_corr_test(d[x], d[y], np.column_stack([d[c] for c in cond]))
+                rec_rows.append({"domain": domain, "graph": graph,
+                                 "implication": f"{x} _||_ {y} | {','.join(cond)}",
+                                 "p_value": pv, "holds_at_0.01": bool(pv > 0.01)})
+    with open(RESULTS / "dag_implication_tests_recorded.csv", "w", newline="",
+              encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rec_rows[0]))
+        w.writeheader()
+        w.writerows(rec_rows)
+    print("wrote results/dag_implication_tests_recorded.csv")
 
 
 if __name__ == "__main__":

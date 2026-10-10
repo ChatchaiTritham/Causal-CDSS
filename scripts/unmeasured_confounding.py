@@ -34,6 +34,8 @@ import csv
 import sys
 from pathlib import Path
 
+import zlib
+
 import numpy as np
 
 REPO = Path(__file__).resolve().parents[1]
@@ -75,6 +77,11 @@ def simulate(cfg: dict, n: int, rng: np.random.Generator) -> dict:
                  + cfg["treat_to_out"] * a + cfg["out_intercept"])
     y = (rng.uniform(0, 1, n) < py).astype(float)
     return dict(age=age, severity=sev, z=z, w=w, a=a, y=y, p_treat=pt, p_out=py)
+
+
+def domain_offset(domain: str, mod: int) -> int:
+    """Per-domain seed offset that is identical in every process (hash() is salted)."""
+    return zlib.crc32(domain.encode("utf-8")) % mod
 
 
 def true_ate(cfg: dict, n: int, rng: np.random.Generator) -> float:
@@ -205,7 +212,7 @@ def main() -> None:
                                        "max_weight_share")} for p in POLICIES}
 
         for r in range(args.reps):
-            rng = np.random.default_rng(args.seed + 1000 * r + hash(domain) % 997)
+            rng = np.random.default_rng(args.seed + 1000 * r + domain_offset(domain, 997))
             d = simulate(cfg, args.n, rng)
             est["naive"].append(naive_ate(d))
             est["backdoor_observed"].append(backdoor_observed_ate(d))
