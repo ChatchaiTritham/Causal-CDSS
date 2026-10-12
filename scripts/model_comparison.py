@@ -90,7 +90,7 @@ except Exception:  # pragma: no cover - environment dependent
     HAVE_TORCH = False
     SEQUENCE_BACKEND = "numpy GRU/1D-CNN PROXY (torch unavailable)"
 
-SEED = 42
+SEED = int(os.environ.get("CAUSAL_SEED", "42"))  # override only for the seed-replication run
 N_PATIENTS = 10000      # synthetic trajectories per domain (manuscript: 10,000)
 T_STEPS = 6             # timesteps per trajectory
 TEST_FRAC = 0.30        # 70/30 train/test split (manuscript)
@@ -516,7 +516,8 @@ def main():
                                   "cf_acc")}
 
     # --- write CSV --------------------------------------------------------- #
-    csv_path = OUT / "model_comparison.csv"
+    SUFFIX = "" if SEED == 42 else f"_seed{SEED}"
+    csv_path = OUT / f"model_comparison{SUFFIX}.csv"
     with csv_path.open("w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["model", "implementation", "auroc", "assoc_acc",
@@ -545,8 +546,8 @@ def main():
               models={kind: dict(implementation=label, **m)
                       for kind, label, m in rows},
               mean=means)
-    (OUT / "model_comparison.json").write_text(json.dumps(js, indent=2))
-    print(f"[OK] {OUT / 'model_comparison.json'}")
+    (OUT / f"model_comparison{SUFFIX}.json").write_text(json.dumps(js, indent=2))
+    print(f"[OK] {OUT / f'model_comparison{SUFFIX}.json'}")
     print("[DONE]")
     return js
 

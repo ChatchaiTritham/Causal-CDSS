@@ -1,0 +1,95 @@
+{
+  "seed": 51,
+  "n_patients_per_domain": 10000,
+  "timesteps": 6,
+  "test_fraction": 0.3,
+  "sequence_backend": "pytorch (faithful LSTM / TCN)",
+  "xgboost_available": true,
+  "domains": [
+    "sepsis",
+    "ards",
+    "acs"
+  ],
+  "models": {
+    "LR": {
+      "implementation": "LR",
+      "auroc": 0.8164208528466568,
+      "accuracy": 0.7485555555555555,
+      "true_ate": -0.14336633549823938,
+      "tau_hat_naive": 0.1529540717601776,
+      "naive_causal_acc": 0.0,
+      "tau_hat_adj": -0.13936257362365723,
+      "adj_causal_acc": 0.9720732076978328,
+      "gap": 0.7485555555555555,
+      "cee": 0.028814944573480564,
+      "ate_align": 1.0,
+      "cf_acc": 0.8011111111111111
+    },
+    "RF": {
+      "implementation": "RF",
+      "auroc": 0.8124419112922914,
+      "accuracy": 0.7468888888888889,
+      "true_ate": -0.14336633549823938,
+      "tau_hat_naive": 0.19219530645535243,
+      "naive_causal_acc": 0.0,
+      "tau_hat_adj": -0.07603340478974532,
+      "adj_causal_acc": 0.5303435044601461,
+      "gap": 0.7468888888888889,
+      "cee": 0.06956869140249268,
+      "ate_align": 0.9405742265746717,
+      "cf_acc": 0.7988888888888889
+    },
+    "XGBoost": {
+      "implementation": "XGBoost",
+      "auroc": 0.8076946265289161,
+      "accuracy": 0.7432222222222222,
+      "true_ate": -0.14336633549823938,
+      "tau_hat_naive": 0.15932106971740723,
+      "naive_causal_acc": 0.0,
+      "tau_hat_adj": -0.13035933673381805,
+      "adj_causal_acc": 0.9092743863528474,
+      "gap": 0.7432222222222222,
+      "cee": 0.04003100068796247,
+      "ate_align": 0.9991097262408191,
+      "cf_acc": 0.8006666666666666
+    },
+    "LSTM": {
+      "implementation": "LSTM",
+      "auroc": 0.8142295362459231,
+      "accuracy": 0.7482222222222222,
+      "true_ate": -0.14336633549823938,
+      "tau_hat_naive": 0.17817318439483643,
+      "naive_causal_acc": 0.0,
+      "tau_hat_adj": -0.12661373615264893,
+      "adj_causal_acc": 0.8831483047441344,
+      "gap": 0.7482222222222222,
+      "cee": 0.0471268360050613,
+      "ate_align": 0.9966614734030714,
+      "cf_acc": 0.8034444444444444
+    },
+    "TCN": {
+      "implementation": "TCN",
+      "auroc": 0.8078084956115147,
+      "accuracy": 0.741,
+      "true_ate": -0.14336633549823938,
+      "tau_hat_naive": 0.17759349942207336,
+      "naive_causal_acc": 0.0,
+      "tau_hat_adj": -0.12081846594810486,
+      "adj_causal_acc": 0.8427254942956157,
+      "gap": 0.741,
+      "cee": 0.044666980447348376,
+      "ate_align": 1.0,
+      "cf_acc": 0.7961111111111111
+    }
+  },
+  "mean": {
+    "auroc": 0.8117190845050605,
+    "accuracy": 0.7455777777777778,
+    "naive_causal_acc": 0.0,
+    "adj_causal_acc": 0.8275129795101153,
+    "gap": 0.7455777777777778,
+    "cee": 0.04604169062326908,
+    "ate_align": 0.9872690852437124,
+    "cf_acc": 0.8000444444444446
+  }
+}
