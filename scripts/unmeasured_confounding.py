@@ -162,6 +162,82 @@ def proximal_se(d: dict) -> tuple[float, float]:
     return float(beta[1]), float(np.sqrt((bread @ meat @ bread)[1, 1]))
 
 
+# Non-convergence counter for the treatment-bridge GMM; read and reset by the drivers.
+BRIDGE_FAILS = {"count": 0, "calls": 0}
+
+
+def outcome_bridge(d: dict) -> np.ndarray:
+    """Linear outcome bridge h(W, A, X) = b0 + bA*A + bW*W + bX*age, fitted by 2SLS with
+    instruments (1, A, Z, age). Returns (b0, bA, bW, bX), the coefficients of proximal_se."""
+    n = len(d["y"])
+    X1 = np.column_stack([d["a"], d["z"], d["age"]])
+    w_hat = np.column_stack([np.ones(n), X1]) @ ols(X1, d["w"])
+    Xh = np.column_stack([np.ones(n), d["a"], w_hat, d["age"]])
+    return np.linalg.lstsq(Xh, d["y"], rcond=None)[0]
+
+
+def treatment_bridge(d: dict) -> np.ndarray:
+    """Treatment bridge q(Z, A, X) of Cui et al. (2024), evaluated at the observed arm.
+
+    For each arm a, q_a(Z, X) = 1 + exp(t_a'(1, Z, age)) solves the just-identified moment
+    equations E[1{A=a} q_a(Z, X) g(W, X) - g(W, X)] = 0 with g = (1, W, age). Starting values
+    are the inverse-propensity form implied by a logistic regression of A on (1, Z, age);
+    a zero start is tried if that fails. A solve counts as converged when every sample moment
+    is below 1e-6 in absolute value.
+    """
+    from scipy.optimize import least_squares
+    n = len(d["a"])
+    F = np.column_stack([np.ones(n), d["z"], d["age"]])
+    G = np.column_stack([np.ones(n), d["w"], d["age"]])
+    lr = LogisticRegression(C=1e6, max_iter=1000).fit(F[:, 1:], d["a"])
+    eta = np.r_[lr.intercept_, lr.coef_.ravel()]
+    q = np.empty(n)
+    for arm, start in ((1, -eta), (0, eta)):
+        ind = (d["a"] == arm).astype(float)
+
+        def mom(t):
+            qa = 1.0 + np.exp(np.clip(F @ t, -50, 50))
+            return ((ind * qa)[:, None] * G - G).mean(axis=0)
+
+        BRIDGE_FAILS["calls"] += 1
+        best = None
+        for t0 in (start, np.zeros(3)):
+            sol = least_squares(mom, t0, method="lm", xtol=1e-12, ftol=1e-12, gtol=1e-12)
+            if best is None or np.max(np.abs(sol.fun)) < np.max(np.abs(best.fun)):
+                best = sol
+            if np.max(np.abs(sol.fun)) < 1e-6:
+                break
+        if np.max(np.abs(best.fun)) >= 1e-6:
+            BRIDGE_FAILS["count"] += 1
+        qa = 1.0 + np.exp(np.clip(F @ best.x, -50, 50))
+        q[ind == 1] = qa[ind == 1]
+    return q
+
+
+def proximal_dr_se(d: dict) -> tuple[float, float, float, float]:
+    """Semiparametric doubly robust proximal estimator (Cui et al., 2024) and proximal IPW.
+
+    psi_DR  = (2A-1) q(Z,A,X) (Y - h(W,A,X)) + h(W,1,X) - h(W,0,X)
+    psi_IPW = (2A-1) q(Z,A,X) Y
+    Each SE is sd(psi)/sqrt(n): it treats h and q as known and so ignores the variance
+    contributed by estimating them. Returns (dr, dr_se, ipw, ipw_se).
+    """
+    b = outcome_bridge(d)
+    h = b[0] + b[1] * d["a"] + b[2] * d["w"] + b[3] * d["age"]
+    q = treatment_bridge(d)
+    sgn = 2 * d["a"] - 1
+    psi = sgn * q * (d["y"] - h) + b[1]
+    psi_ipw = sgn * q * d["y"]
+    rn = np.sqrt(len(psi))
+    return (float(psi.mean()), float(psi.std(ddof=1) / rn),
+            float(psi_ipw.mean()), float(psi_ipw.std(ddof=1) / rn))
+
+
+def proximal_dr_only(d: dict) -> tuple[float, float]:
+    th, se, _, _ = proximal_dr_se(d)
+    return th, se
+
+
 def first_stage_f(d: dict) -> float:
     """Partial F statistic of Z in the first-stage regression of W on (A, Z, age)."""
     n = len(d["w"])
@@ -308,8 +384,9 @@ def main() -> None:
     prox_rows, pol_rows, cov_rows = [], [], []
     for domain, cfg in DOMAINS.items():
         truth = true_ate(cfg, 200_000, np.random.default_rng(args.seed + 999))
-        est = {k: [] for k in ("naive", "backdoor_observed", "backdoor_proxy", "proximal")}
-        cover = {k: [] for k in ("backdoor_proxy", "proximal")}
+        est = {k: [] for k in ("naive", "backdoor_observed", "backdoor_proxy", "proximal",
+                               "proximal_dr", "proximal_ipw")}
+        cover = {k: [] for k in ("backdoor_proxy", "proximal", "proximal_dr", "proximal_ipw")}
         keys = ("ipw", "snipw", "dr", "outcome_only", "truth", "dr_cover", "dr_se",
                 "ipw_cover", "ess_frac", "agreement", "max_weight_share", "treated")
         pol_acc = {(p, nk): {k: [] for k in keys} for p in POLICY_NAMES for nk in NUISANCES}
@@ -324,6 +401,10 @@ def main() -> None:
             est["backdoor_observed"].append(backdoor_observed_ate(d))
             for name, fn in (("backdoor_proxy", backdoor_proxy_se), ("proximal", proximal_se)):
                 th, se = fn(d)
+                est[name].append(th)
+                cover[name].append(float(th - 1.96 * se <= truth <= th + 1.96 * se))
+            dr, dr_se, ipw, ipw_se = proximal_dr_se(d)
+            for name, th, se in (("proximal_dr", dr, dr_se), ("proximal_ipw", ipw, ipw_se)):
                 est[name].append(th)
                 cover[name].append(float(th - 1.96 * se <= truth <= th + 1.96 * se))
 
@@ -383,6 +464,8 @@ def main() -> None:
                              "mean_max_weight_share": round(float(np.mean(acc["max_weight_share"])), 5),
                              "reps": args.reps})
 
+    print(f"treatment-bridge GMM non-convergence: {BRIDGE_FAILS['count']} of "
+          f"{BRIDGE_FAILS['calls']} arm-level solves")
     write(prox_rows, "proximal_estimates.csv")
     write(pol_rows, "policy_value_estimates.csv")
     write(cov_rows, "policy_value_coverage.csv")

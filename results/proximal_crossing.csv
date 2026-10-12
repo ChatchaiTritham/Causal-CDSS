@@ -1,4 +1,4 @@
-domain,gamma_star,delta_star
-sepsis,0.228,0.178
-ards,0.242,0.199
-cardiac,0.174,0.157
+domain,gamma_star,delta_star,gamma_star_dr,delta_star_dr
+sepsis,0.228,0.178,0.291,0.226
+ards,0.242,0.199,0.281,0.232
+cardiac,0.174,0.157,0.283,0.253

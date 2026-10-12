@@ -161,7 +161,7 @@ def fig_sweeps() -> None:
                                 (axes[1], w, "delta_a_to_w", r"Direct effect $\delta$ of $T$ on $W$", "(b)")):
         for dom, col in dom_col.items():
             for est, ls, mk in (("proximal", "-", "o"), ("backdoor_proxy", ":", "^"),
-                                ("backdoor_observed", "--", "s")):
+                                ("backdoor_observed", "--", "s"), ("proximal_dr", "-.", "D")):
                 g = d[(d.domain == dom) & (d.estimator == est)].sort_values(key)
                 ax.plot(g[key], g.abs_bias, ls=ls, marker=mk, ms=3, lw=1.0, color=col)
         ax.set_xlabel(xl)
@@ -171,8 +171,9 @@ def fig_sweeps() -> None:
     h = [Line2D([], [], color=c, lw=1.2, label=NICE_DOMAIN[k]) for k, c in dom_col.items()]
     h += [Line2D([], [], color="black", ls="-", marker="o", ms=3, label="Proximal"),
           Line2D([], [], color="black", ls=":", marker="^", ms=3, label="Backdoor on age, Z, W"),
-          Line2D([], [], color="black", ls="--", marker="s", ms=3, label="Backdoor on age only")]
-    fig.legend(handles=h, loc="lower center", ncol=6, frameon=False, fontsize=6.5,
+          Line2D([], [], color="black", ls="--", marker="s", ms=3, label="Backdoor on age only"),
+          Line2D([], [], color="black", ls="-.", marker="D", ms=3, label="Proximal DR")]
+    fig.legend(handles=h, loc="lower center", ncol=7, frameon=False, fontsize=6.5,
                handlelength=2.2, columnspacing=1.0, bbox_to_anchor=(0.5, -0.12))
     fig.tight_layout()
     fig.savefig(OUT / "fig_proximal_sweeps.pdf", bbox_inches="tight")
