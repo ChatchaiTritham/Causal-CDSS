@@ -8,8 +8,7 @@ lines = []
 for _, r in d.iterrows():
     if r["learner"].startswith("Oracle"):
         lines.append(r"\midrule")
-    ca = "--" if r["learner"].startswith("Oracle") and False else \
-        f"${r.ca_mean*100:.1f} \pm {r.ca_std*100:.1f}$\%"
+    ca = f"${r.ca_mean*100:.1f} \pm {r.ca_std*100:.1f}$\%"
     name = r"Oracle $E[	au \mid X]$" if r.learner.startswith("Oracle") else r.learner
     lines.append(f"{name} & {r.base} & {ca} & ${r.cee_mean:.3f} \pm {r.cee_std:.3f}$ & "
                  f"${r.pehe_mean:.3f} \pm {r.pehe_std:.3f}$ & "
