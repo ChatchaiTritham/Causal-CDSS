@@ -1,0 +1,10 @@
+Friedman test on CEE across 8 learner x base combos, 10 seeds: chi2=69.000, p=2.35e-12
+Mean ranks (1=lowest CEE):
+  S-learner / LR: 1.00
+  T-learner / LR: 2.00
+  S-learner / HistGB: 3.30
+  X-learner / HistGB: 3.70
+  DR-learner / HistGB: 5.10
+  DR-learner / LR: 5.90
+  T-learner / HistGB: 7.00
+  X-learner / LR: 8.00
