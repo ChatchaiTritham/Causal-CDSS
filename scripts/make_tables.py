@@ -1,0 +1,202 @@
+"""Write every LaTeX table of the manuscript and supplement from the released result files.
+
+No number in a table is typed by hand: each table body below is generated from a CSV in
+results/ and written to tables/*.tex, which the manuscript includes with \\input.
+
+Usage: python scripts/make_tables.py
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pandas as pd
+
+REPO = Path(__file__).resolve().parents[1]
+RES, OUT = REPO / "results", REPO / "tables"
+OUT.mkdir(exist_ok=True)
+
+DOM = {"sepsis": "Sepsis", "ards": "ARDS", "cardiac": "ACS"}
+EST = {"naive": "Naive", "backdoor_observed": "Backdoor, age only",
+       "backdoor_proxy": "Backdoor, age $+$ $Z$, $W$", "proximal": "\\textbf{Proximal}"}
+POL = {"treat_all": "Treat all", "treat_none": "Treat none",
+       "cdss_top50": "Risk rule, top 50\\%", "cdss_top25": "Risk rule, top 25\\%",
+       "knowledge": "Knowledge-driven rule"}
+
+
+def f(x, d=3, sign=False):
+    if pd.isna(x) or x == "":
+        return "---"
+    s = f"{float(x):+.{d}f}" if sign else f"{float(x):.{d}f}"
+    return f"${s}$" if sign else s
+
+
+def write(name: str, body: str) -> None:
+    (OUT / name).write_text(body, encoding="utf-8")
+    print("wrote tables/" + name)
+
+
+def tab_proximal() -> None:
+    d = pd.read_csv(RES / "proximal_estimates.csv")
+    lines = []
+    for dom, nice in DOM.items():
+        g = d[d.domain == dom].set_index("estimator")
+        for i, (k, lab) in enumerate(EST.items()):
+            r = g.loc[k]
+            lines.append(f"{nice if i == 0 else ''} & {lab} & {f(r.mean_estimate, 3, True)} & "
+                         f"{f(r.bias, 3, True)} & {f(r.mcse_bias, 4)} & {f(r.rmse)} & "
+                         f"{f(r.ci95_coverage, 2) if k in ('proximal', 'backdoor_proxy') else '---'} \\\\")
+        lines.append("\\midrule" if dom != "cardiac" else "")
+    write("tab_proximal.tex", "\n".join(l for l in lines if l))
+
+
+def tab_ope() -> None:
+    c = pd.read_csv(RES / "policy_value_coverage.csv")
+    v = pd.read_csv(RES / "policy_value_estimates.csv")
+    m = c.merge(v[["domain", "policy", "nuisance", "true_value"]], on=["domain", "policy", "nuisance"])
+    g = m.groupby(["policy", "nuisance"]).mean(numeric_only=True)
+    lines = []
+    for p, lab in POL.items():
+        rec, ora = g.loc[(p, "logistic_recorded")], g.loc[(p, "logistic_oracle")]
+        cov_rng = m[(m.policy == p) & (m.nuisance == "logistic_recorded")].dr_ci95_coverage
+        lines.append(f"{lab} & {f(rec.treated_fraction, 2)} & {f(rec.true_value)} & "
+                     f"{f(rec.mean_ess_fraction, 2)} & {f(rec.mean_policy_agreement, 2)} & "
+                     f"{f(rec.dr_bias, 3, True)} & {f(rec.dr_ci95_coverage, 2)} "
+                     f"({f(cov_rng.min(), 2)}--{f(cov_rng.max(), 2)}) & "
+                     f"{f(ora.dr_bias, 3, True)} & {f(ora.dr_ci95_coverage, 2)} \\\\")
+    write("tab_ope.tex", "\n".join(lines))
+
+
+def tab_ope_full() -> None:
+    c = pd.read_csv(RES / "policy_value_coverage.csv")
+    lines = []
+    for dom, nice in DOM.items():
+        for i, (p, lab) in enumerate(POL.items()):
+            row = [nice if i == 0 else "", lab]
+            for nk in ("linear_recorded", "logistic_recorded", "logistic_oracle"):
+                r = c[(c.domain == dom) & (c.policy == p) & (c.nuisance == nk)].iloc[0]
+                row += [f(r.dr_bias, 3, True), f"{f(r.dr_ci95_coverage, 2)}"]
+            r = c[(c.domain == dom) & (c.policy == p) & (c.nuisance == "logistic_recorded")].iloc[0]
+            row += [f(r.mean_ess_fraction, 2)]
+            lines.append(" & ".join(row) + " \\\\")
+        if dom != "cardiac":
+            lines.append("\\midrule")
+    write("tab_ope_full.tex", "\n".join(lines))
+
+
+def tab_dml() -> None:
+    d = pd.read_csv(RES / "dml_estimates.csv")
+    lines = []
+    for dom, nice in DOM.items():
+        for i, (adj, lab) in enumerate((("oracle_severity_recorded", "Age, severity (oracle)"),
+                                        ("recorded_only", "Age, $Z$, $W$ (recorded)"))):
+            a = d[(d.domain == dom) & (d.score == "aipw") & (d.adjustment_set == adj)].iloc[0]
+            p = d[(d.domain == dom) & (d.score == "plr") & (d.adjustment_set == adj)].iloc[0]
+            lines.append(f"{nice if i == 0 else ''} & {lab} & {f(a.bias, 3, True)} & "
+                         f"{f(a.ci95_coverage, 2)} & {f(p.bias, 3, True)} & {f(p.ci95_coverage, 2)} \\\\")
+        if dom != "cardiac":
+            lines.append("\\midrule")
+    write("tab_dml.tex", "\n".join(lines))
+
+
+def tab_dag() -> None:
+    d = pd.read_csv(RES / "dag_implication_tests.csv")
+    r = pd.read_csv(RES / "dag_implication_tests_recorded.csv")
+    names = {"true": "True graph", "missing_edge_sev_to_y": "Missing severity $\\to$ outcome",
+             "extra_edge_age_to_a": "Extra age $\\to$ treatment"}
+    lines = []
+    for g, lab in names.items():
+        cells = []
+        for src in (d, r):
+            for dom in DOM:
+                s = src[(src.domain == dom) & (src.graph == g)]
+                cells.append("---" if s.empty else f"{int(s.holds_bonferroni.sum())}/{len(s)}")
+        lines.append(f"{lab} & " + " & ".join(cells) + " \\\\")
+    write("tab_dag.tex", "\n".join(lines))
+
+
+def tab_sweep(fname: str, key: str, out: str) -> None:
+    d = pd.read_csv(RES / fname)
+    grid = sorted(d[key].unique())
+    lines = []
+    for dom, nice in DOM.items():
+        for i, (e, lab) in enumerate((("proximal", "Proximal"), ("backdoor_proxy", "Backdoor, age $+$ $Z$, $W$"),
+                                      ("backdoor_observed", "Backdoor, age only"))):
+            g = d[(d.domain == dom) & (d.estimator == e)].set_index(key)
+            lines.append(f"{nice if i == 0 else ''} & {lab} & "
+                         + " & ".join(f(g.loc[x, "abs_bias"]) for x in grid) + " \\\\")
+        g = d[(d.domain == dom) & (d.estimator == "proximal")].set_index(key)
+        lines.append(" & \\emph{Proximal 95\\% coverage} & "
+                     + " & ".join(f(g.loc[x, "ci95_coverage"], 2) for x in grid) + " \\\\")
+        if dom != "cardiac":
+            lines.append("\\midrule")
+    write(out, "\n".join(lines))
+
+
+def tab_crossing() -> None:
+    d = pd.read_csv(RES / "proximal_crossing.csv")
+    write("tab_crossing.tex", "\n".join(
+        f"{DOM[r.domain]} & {f(r.gamma_star, 2)} & {f(r.delta_star, 2)} \\\\" for r in d.itertuples()))
+
+
+def tab_nonlinear() -> None:
+    d = pd.read_csv(RES / "proximal_nonlinear.csv")
+    reg = {"linear": "Linear (reference)", "quadratic": "Quadratic severity",
+           "threshold": "Threshold severity", "proxy_nl": "Dichotomised proxies"}
+    lines = []
+    for dom, nice in DOM.items():
+        for i, (k, lab) in enumerate(reg.items()):
+            g = d[(d.domain == dom) & (d.regime == k)].set_index("estimator")
+            lines.append(f"{nice if i == 0 else ''} & {lab} & {f(g.loc['proximal', 'true_ate'], 3, True)} & "
+                         f"{f(g.loc['proximal', 'abs_bias'], 4)} & {f(g.loc['proximal', 'mcse_bias'], 4)} & "
+                         f"{f(g.loc['proximal', 'ci95_coverage'], 2)} & "
+                         f"{f(g.loc['backdoor_proxy', 'abs_bias'], 3)} & {f(g.loc['backdoor_observed', 'abs_bias'], 3)} \\\\")
+        if dom != "cardiac":
+            lines.append("\\midrule")
+    write("tab_nonlinear.tex", "\n".join(lines))
+
+
+def tab_weak() -> None:
+    d = pd.read_csv(RES / "proximal_weak_proxies.csv")
+    lines = []
+    for dom, nice in DOM.items():
+        for i, s in enumerate(sorted(d.proxy_scale.unique(), reverse=True)):
+            g = d[(d.domain == dom) & (d.proxy_scale == s)].set_index("estimator")
+            p = g.loc["proximal"]
+            lines.append(f"{nice if i == 0 else ''} & {s:g} & {p.first_stage_f:.1f} & {f(p.bias, 3, True)} & "
+                         f"{f(p.sd)} & {f(p.ci95_coverage, 2)} & {f(g.loc['backdoor_proxy', 'bias'], 3, True)} \\\\")
+        if dom != "cardiac":
+            lines.append("\\midrule")
+    write("tab_weak.tex", "\n".join(lines))
+
+
+def tab_models() -> None:
+    d = pd.read_csv(RES / "model_comparison_seeds.csv")
+    lines = []
+    for r in d.itertuples():
+        if r.model == "Mean":
+            lines.append("\\midrule")
+            lines.append(f"Mean & {f(r.auroc_mean)} & {r.assoc_acc_mean * 100:.1f}\\% & "
+                         f"{r.adj_causal_acc_mean * 100:.1f}\\% & {f(r.cee_causal_mean)} & {f(r.ate_align_causal_mean)} \\\\")
+            continue
+        lines.append(f"{r.model} & ${r.auroc_mean:.3f} \\pm {r.auroc_std:.3f}$ & "
+                     f"${r.assoc_acc_mean * 100:.1f} \\pm {r.assoc_acc_std * 100:.1f}$\\% & "
+                     f"${r.adj_causal_acc_mean * 100:.1f} \\pm {r.adj_causal_acc_std * 100:.1f}$\\% & "
+                     f"${r.cee_causal_mean:.3f} \\pm {r.cee_causal_std:.3f}$ & "
+                     f"${r.ate_align_causal_mean:.3f} \\pm {r.ate_align_causal_std:.3f}$ \\\\")
+    write("tab_models.tex", "\n".join(lines))
+
+
+if __name__ == "__main__":
+    tab_proximal()
+    tab_ope()
+    tab_ope_full()
+    tab_sweep("proximal_robustness.csv", "gamma_z_to_y", "tab_sweep_gamma.tex")
+    tab_sweep("proximal_robustness_w.csv", "delta_a_to_w", "tab_sweep_delta.tex")
+    tab_crossing()
+    tab_nonlinear()
+    tab_weak()
+    tab_models()
+    if (RES / "dml_estimates.csv").exists():
+        tab_dml()
+    if "holds_bonferroni" in pd.read_csv(RES / "dag_implication_tests.csv").columns:
+        tab_dag()

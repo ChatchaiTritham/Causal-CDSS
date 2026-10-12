@@ -1,7 +1,7 @@
-domain,graph,implication,p_value,holds_at_0.01
-sepsis,missing_edge_sev_to_y,"z _||_ y | a,age",0.0,False
-sepsis,missing_edge_sev_to_y,"w _||_ y | a,age",0.0,False
-ards,missing_edge_sev_to_y,"z _||_ y | a,age",0.0,False
-ards,missing_edge_sev_to_y,"w _||_ y | a,age",0.0,False
-cardiac,missing_edge_sev_to_y,"z _||_ y | a,age",0.0,False
-cardiac,missing_edge_sev_to_y,"w _||_ y | a,age",0.0,False
+domain,graph,implication,p_value,alpha_bonferroni,holds_bonferroni
+sepsis,missing_edge_sev_to_y,"z _||_ y | a,age",0.0,0.025,False
+sepsis,missing_edge_sev_to_y,"w _||_ y | a,age",0.0,0.025,False
+ards,missing_edge_sev_to_y,"z _||_ y | a,age",0.0,0.025,False
+ards,missing_edge_sev_to_y,"w _||_ y | a,age",0.0,0.025,False
+cardiac,missing_edge_sev_to_y,"z _||_ y | a,age",0.0,0.025,False
+cardiac,missing_edge_sev_to_y,"w _||_ y | a,age",0.0,0.025,False

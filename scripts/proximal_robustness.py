@@ -76,8 +76,57 @@ from sklearn.ensemble import (  # noqa: E402
 from sklearn.model_selection import KFold  # noqa: E402
 
 from unmeasured_confounding import (  # noqa: E402
-    DOMAINS, backdoor_observed_ate, domain_offset, ols, proximal_ate, sigmoid, true_ate,
+    DOMAINS, backdoor_observed_ate, backdoor_proxy_se, domain_offset, first_stage_f, ols,
+    proximal_se, sigmoid, true_ate,
 )
+
+ESTIMATORS = ("proximal", "backdoor_proxy", "backdoor_observed")
+PROXY_SCALES = (1.0, 0.5, 0.25, 0.1)
+
+
+def run_estimators(d: dict, truth: float, acc: dict) -> None:
+    """Append the three estimates (and interval coverage where an SE exists) to ``acc``."""
+    for name, fn in (("proximal", proximal_se), ("backdoor_proxy", backdoor_proxy_se)):
+        th, se = fn(d)
+        acc[name].append(th)
+        acc[name + "_cover"].append(float(abs(th - truth) <= 1.96 * se))
+    acc["backdoor_observed"].append(backdoor_observed_ate(d))
+
+
+def new_acc() -> dict:
+    return {k: [] for k in ESTIMATORS + ("proximal_cover", "backdoor_proxy_cover")}
+
+
+def summarise(acc: dict, truth: float, extra: dict) -> list[dict]:
+    rows = []
+    for name in ESTIMATORS:
+        v = np.array(acc[name])
+        cov = acc.get(name + "_cover")
+        rows.append({**extra, "estimator": name, "true_ate": round(truth, 4),
+                     "mean_estimate": round(float(v.mean()), 4),
+                     "bias": round(float(v.mean() - truth), 4),
+                     "abs_bias": round(abs(float(v.mean() - truth)), 4),
+                     "mcse_bias": round(float(v.std(ddof=1) / np.sqrt(len(v))), 4),
+                     "sd": round(float(v.std(ddof=1)), 4),
+                     "ci95_coverage": round(float(np.mean(cov)), 3) if cov else "",
+                     "reps": len(v)})
+    return rows
+
+
+def crossing(rows: list[dict], key: str) -> float | None:
+    """Smallest violation at which proximal |bias| reaches the proxy-adjusted backdoor's.
+
+    Linear interpolation between grid points; None if no crossing in the swept range.
+    """
+    grid = sorted({r[key] for r in rows})
+    diff = []
+    for g in grid:
+        b = {r["estimator"]: r["abs_bias"] for r in rows if r[key] == g}
+        diff.append(b["proximal"] - b["backdoor_proxy"])
+    for (g0, d0), (g1, d1) in zip(zip(grid, diff), zip(grid[1:], diff[1:])):
+        if d0 < 0 <= d1:
+            return round(g0 + (g1 - g0) * (-d0) / (d1 - d0), 3)
+    return None
 
 RESULTS = REPO / "results"
 GAMMAS = (0.0, 0.05, 0.1, 0.2, 0.3, 0.5)
@@ -137,7 +186,7 @@ CURVE = 0.6  # strength of the nonlinear severity term, on the outcome logit sca
 def _sev_effect(sev, regime: float | str):
     """How severity enters the outcome logit under each regime."""
     if regime == "quadratic":
-        return sev + CURVE * (sev ** 2 - 1.0)      # centred so the mean effect is comparable
+        return sev + CURVE * (sev ** 2 - np.var(sev))   # centred at the variance of severity
     if regime == "threshold":
         return sev + CURVE * (sev > 0).astype(float)
     return sev
@@ -247,9 +296,12 @@ def implied_independencies(graph: str) -> list[tuple[str, str, tuple[str, ...]]]
     """
     base = [
         ("z", "a", ("severity",)),        # z _||_ a | severity
-        ("z", "y", ("severity", "a")),    # exclusion restriction on z
+        ("z", "y", ("severity", "a", "age")),  # exclusion restriction on z
         ("w", "a", ("severity",)),        # w _||_ a | severity
+        ("w", "y", ("severity", "a", "age")),  # w carries no outcome information beyond severity
         ("z", "w", ("severity",)),        # the two proxies share only severity
+        ("z", "age", ("severity",)),      # proxies depend on age only through severity
+        ("w", "age", ("severity",)),
         ("age", "a", ("severity",)),      # age acts on treatment only through severity
     ]
     if graph == "true":
@@ -293,20 +345,12 @@ def main() -> None:
         for gamma in GAMMAS:
             truth = true_ate_violated(cfg, 200_000,
                                       np.random.default_rng(args.seed + 7), gamma)
-            est = {"proximal": [], "backdoor_observed": []}
+            acc = new_acc()
             for r in range(args.reps):
                 rng = np.random.default_rng(args.seed + 131 * r + domain_offset(domain, 97))
                 d = simulate_violated(cfg, args.n, rng, gamma)
-                est["proximal"].append(proximal_ate(d))
-                est["backdoor_observed"].append(backdoor_observed_ate(d))
-            for name, vals in est.items():
-                v = np.array(vals)
-                rows.append({"domain": domain, "gamma_z_to_y": gamma, "estimator": name,
-                             "true_ate": round(truth, 4),
-                             "mean_estimate": round(float(v.mean()), 4),
-                             "bias": round(float(v.mean() - truth), 4),
-                             "abs_bias": round(abs(float(v.mean() - truth)), 4),
-                             "reps": args.reps, "n": args.n})
+                run_estimators(d, truth, acc)
+            rows += summarise(acc, truth, {"domain": domain, "gamma_z_to_y": gamma, "n": args.n})
             p = [r for r in rows if r["domain"] == domain and r["gamma_z_to_y"] == gamma]
             print(f"  {domain:8} gamma {gamma:<5} "
                   + "  ".join(f"{r['estimator']}: {r['abs_bias']:.3f}" for r in p), flush=True)
@@ -322,20 +366,12 @@ def main() -> None:
     for domain, cfg in DOMAINS.items():
         truth = true_ate(cfg, 200_000, np.random.default_rng(args.seed + 7))
         for delta in GAMMAS:
-            est = {"proximal": [], "backdoor_observed": []}
+            acc = new_acc()
             for r in range(args.reps):
                 rng = np.random.default_rng(args.seed + 211 * r + domain_offset(domain, 97))
                 d = simulate_violated_w(cfg, args.n, rng, delta)
-                est["proximal"].append(proximal_ate(d))
-                est["backdoor_observed"].append(backdoor_observed_ate(d))
-            for name, vals in est.items():
-                v = np.array(vals)
-                wrows.append({"domain": domain, "delta_a_to_w": delta, "estimator": name,
-                              "true_ate": round(truth, 4),
-                              "mean_estimate": round(float(v.mean()), 4),
-                              "bias": round(float(v.mean() - truth), 4),
-                              "abs_bias": round(abs(float(v.mean() - truth)), 4),
-                              "reps": args.reps, "n": args.n})
+                run_estimators(d, truth, acc)
+            wrows += summarise(acc, truth, {"domain": domain, "delta_a_to_w": delta, "n": args.n})
             pr = [r for r in wrows if r["domain"] == domain and r["delta_a_to_w"] == delta]
             print(f"  {domain:8} delta {delta:<5} "
                   + "  ".join(f"{r['estimator']}: {r['abs_bias']:.3f}" for r in pr), flush=True)
@@ -346,37 +382,67 @@ def main() -> None:
         w.writerows(wrows)
     print("wrote results/proximal_robustness_w.csv")
 
+    # ------------------------------------------------- crossing points vs proxy backdoor
+    cross = []
+    for domain in DOMAINS:
+        cross.append({"domain": domain,
+                      "gamma_star": crossing([r for r in rows if r["domain"] == domain],
+                                             "gamma_z_to_y"),
+                      "delta_star": crossing([r for r in wrows if r["domain"] == domain],
+                                             "delta_a_to_w")})
+        print(f"  crossing {domain:8} gamma* {cross[-1]['gamma_star']}  "
+              f"delta* {cross[-1]['delta_star']}", flush=True)
+    with open(RESULTS / "proximal_crossing.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(cross[0]))
+        w.writeheader()
+        w.writerows(cross)
+    print("wrote results/proximal_crossing.csv")
+
+    # ------------------------------------------------- 1d. weak proxies
+    # Both proxy loadings are scaled by s; s = 1 is the main design. Proximal two-stage
+    # estimation is known to become unstable as the first stage weakens.
+    weak_rows = []
+    for domain, cfg in DOMAINS.items():
+        truth = true_ate(cfg, 200_000, np.random.default_rng(args.seed + 7))
+        for scale in PROXY_SCALES:
+            c = dict(cfg, sev_to_z=cfg["sev_to_z"] * scale, sev_to_w=cfg["sev_to_w"] * scale)
+            acc, fs = new_acc(), []
+            for r in range(args.reps):
+                rng = np.random.default_rng(args.seed + 401 * r + domain_offset(domain, 97))
+                d = simulate_violated(c, args.n, rng, 0.0)
+                run_estimators(d, truth, acc)
+                fs.append(first_stage_f(d))
+            weak_rows += summarise(acc, truth, {"domain": domain, "proxy_scale": scale,
+                                                "first_stage_f": round(float(np.median(fs)), 1),
+                                                "n": args.n})
+            pr = {r["estimator"]: r for r in weak_rows
+                  if r["domain"] == domain and r["proxy_scale"] == scale}
+            print(f"  weak {domain:8} s={scale:<5} F={pr['proximal']['first_stage_f']:<8} "
+                  f"prox bias {pr['proximal']['bias']:+.3f} sd {pr['proximal']['sd']:.3f}  "
+                  f"proxy-backdoor {pr['backdoor_proxy']['bias']:+.3f}", flush=True)
+    with open(RESULTS / "proximal_weak_proxies.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(weak_rows[0]))
+        w.writeheader()
+        w.writerows(weak_rows)
+    print("wrote results/proximal_weak_proxies.csv")
+
     # ------------------------------------------------- 1c. nonlinear severity
     nl_rows = []
     for domain, cfg in DOMAINS.items():
         for regime in REGIMES:
             truth = true_ate_nonlinear(cfg, 200_000,
                                        np.random.default_rng(args.seed + 13), regime)
-            est = {"proximal": [], "backdoor_observed": []}
+            acc = new_acc()
             for r in range(args.reps):
                 rng = np.random.default_rng(args.seed + 307 * r + domain_offset(domain, 97))
                 d = simulate_nonlinear(cfg, args.n, rng, regime)
-                est["proximal"].append(proximal_ate(d))
-                est["backdoor_observed"].append(backdoor_observed_ate(d))
-            for name, vals in est.items():
-                v = np.array(vals)
-                # MCSE is reported because a bias rounded to four decimals can print as
-                # 0.0000 while being merely small: without it a reader cannot tell an exact
-                # recovery from a lucky seed block, and in this regime it is the latter
-                mcse = float(v.std(ddof=1) / np.sqrt(len(v)))
-                nl_rows.append({"domain": domain, "regime": regime, "estimator": name,
-                                "true_ate": round(truth, 5),
-                                "mean_estimate": round(float(v.mean()), 5),
-                                "bias": round(float(v.mean() - truth), 5),
-                                "abs_bias": round(abs(float(v.mean() - truth)), 5),
-                                "mcse": round(mcse, 5),
-                                "reps": args.reps, "n": args.n})
+                run_estimators(d, truth, acc)
+            nl_rows += summarise(acc, truth, {"domain": domain, "regime": regime, "n": args.n})
             pr = {r["estimator"]: r for r in nl_rows
                   if r["domain"] == domain and r["regime"] == regime}
-            ratio = (pr["backdoor_observed"]["abs_bias"] / pr["proximal"]["abs_bias"]
-                     if pr["proximal"]["abs_bias"] > 0 else float("inf"))
             print(f"  {domain:8} {regime:10} prox {pr['proximal']['abs_bias']:.3f}  "
-                  f"back {pr['backdoor_observed']['abs_bias']:.3f}  ratio {ratio:.2f}", flush=True)
+                  f"proxy-back {pr['backdoor_proxy']['abs_bias']:.3f}  "
+                  f"age-back {pr['backdoor_observed']['abs_bias']:.3f}", flush=True)
 
     with open(RESULTS / "proximal_nonlinear.csv", "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(nl_rows[0]))
@@ -421,14 +487,17 @@ def main() -> None:
         d = simulate_violated(cfg, args.n, rng, 0.0)
         for graph in ("true", "missing_edge_sev_to_y", "extra_edge_age_to_a"):
             tests = implied_independencies(graph)
+            alpha = 0.05 / len(tests)          # Bonferroni over the graph's implications
             passed = 0
             for x, y, cond in tests:
                 Z = np.column_stack([d[c] for c in cond]) if cond else None
                 pv = partial_corr_test(d[x], d[y], Z)
-                passed += pv > 0.05
+                passed += pv > alpha
                 dag_rows.append({"domain": domain, "graph": graph,
                                  "implication": f"{x} _||_ {y} | {','.join(cond) or '-'}",
-                                 "p_value": round(pv, 5), "holds_at_0.05": bool(pv > 0.05)})
+                                 "p_value": round(pv, 5), "alpha_bonferroni": round(alpha, 5),
+                                 "holds_bonferroni": bool(pv > alpha),
+                                 "holds_at_0.05": bool(pv > 0.05)})
             print(f"  DAG {domain:8} {graph:24} {passed}/{len(tests)} implications hold",
                   flush=True)
     with open(RESULTS / "dag_implication_tests.csv", "w", newline="", encoding="utf-8") as fh:
@@ -442,11 +511,14 @@ def main() -> None:
         rng = np.random.default_rng(args.seed + domain_offset(domain, 83))
         d = simulate_violated(cfg, args.n, rng, 0.0)
         for graph in ("true", "missing_edge_sev_to_y", "extra_edge_age_to_a"):
-            for x, y, cond in implied_independencies_recorded(graph):
+            tests = implied_independencies_recorded(graph)
+            for x, y, cond in tests:
+                alpha = 0.05 / len(tests)
                 pv = partial_corr_test(d[x], d[y], np.column_stack([d[c] for c in cond]))
                 rec_rows.append({"domain": domain, "graph": graph,
                                  "implication": f"{x} _||_ {y} | {','.join(cond)}",
-                                 "p_value": pv, "holds_at_0.01": bool(pv > 0.01)})
+                                 "p_value": pv, "alpha_bonferroni": alpha,
+                                 "holds_bonferroni": bool(pv > alpha)})
     with open(RESULTS / "dag_implication_tests_recorded.csv", "w", newline="",
               encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(rec_rows[0]))

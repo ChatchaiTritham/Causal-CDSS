@@ -10,7 +10,7 @@ Clinical decision support is usually graded the way a forecaster is graded: AURO
 
 This repository turns that argument into something you can execute. The driver builds a small structural causal model for each of three critical-care settings, draws a synthetic observational cohort in which disease severity drives both who is treated and who survives, and then estimates the treatment effect three ways: the naive difference, backdoor regression adjustment, and a doubly-robust estimator. Against each estimate it places the ground truth recovered by do-calculus on the same model, so the gap between association and causation is measured rather than asserted.
 
-The aim is narrow and honest. Everything here runs on simulated data with a known answer, which is what lets us score an estimator against truth at all; it is an in-distribution demonstration of the evaluation idea, not a clinical validation. The companion manuscript (target: *Knowledge and Information Systems*) develops the larger five-metric framework and a separate digital-twin study; see the note under Key results about how the two number sets relate.
+The aim is narrow and honest. Everything here runs on simulated data with a known answer, which is what lets us score an estimator against truth at all; it is an in-distribution demonstration of the evaluation idea, not a clinical validation. The manuscript (*Auditing Knowledge-Driven Clinical Decision Support under Unmeasured Confounding: A Structural Causal Model Protocol*, submitted to *Knowledge-Based Systems*) builds on this verification cohort and adds an audit cohort in which severity is unrecorded; its analyses are listed under **Audit-cohort analyses** below.
 
 ## Key results
 
@@ -22,12 +22,14 @@ All figures below are written by `run_all.py` at seed 42, from an 8,000-patient 
 - Subgroup CATE varies several-fold: for sepsis the true effect ranges from −0.053 (young, low-severity) to −0.307 (young, high-severity), and the estimated CATE tracks it with a Causal Consistency Index (true-vs-estimated correlation) of 0.74–0.95 across domains.
 - Counterfactual sign accuracy is 1.00 in all three domains, and the E-value sensitivity sits between 1.59 (ARDS) and 2.21 (ACS).
 
-**Relationship to the manuscript.** The repository contains both experiments
+**Relationship to the manuscript.** The results above are the *verification cohort*
+(Supplementary Section S8 of the paper). The repository contains every experiment
 reported in the paper. `run_all.py` regenerates the domain-level SCM,
 intervention, subgroup, and sensitivity analyses. The separate
 `scripts/model_comparison.py` driver trains LR, RF, XGBoost, LSTM, and TCN on
 10,000 trajectories per domain and regenerates the associational-versus-causal
-table used in the abstract and main results. The numerical environment is fully
+table of Supplementary Section S8; `scripts/seed_replication.py` repeats it over seeds
+42–51 and adds the Friedman and Holm–Wilcoxon tests. The numerical environment is fully
 pinned in `requirements.txt`; the model-comparison driver fails closed rather
 than writing submission evidence from its labelled proxy if PyTorch is absent.
 
@@ -45,7 +47,17 @@ Causal-CDSS/
 │   ├── cate_subgroups.csv     # CATE over age × severity strata
 │   ├── causal_metrics.csv     # the five causal-evaluation metrics per estimator
 │   └── confounding_sensitivity.csv  # confounding bias, risk ratio, E-value
-└── figures/                   # plotting scripts (see Results and figures)
+├── scripts/
+│   ├── unmeasured_confounding.py   # audit cohort: ATE estimators, policy value (recorded vs oracle)
+│   ├── proximal_robustness.py      # exclusion sweeps, crossing points, weak proxies,
+│   │                               #   nonlinear severity, DML, graph tests (Bonferroni)
+│   ├── model_comparison.py         # verification cohort: five architectures (CAUSAL_SEED env)
+│   ├── seed_replication.py         # ten-seed replication + Friedman/Holm tests
+│   ├── make_unmeasured_figures.py  # figures of the paper
+│   ├── make_protocol_figure.py     # protocol overview diagram
+│   └── make_tables.py              # writes every LaTeX table of the paper to tables/
+├── tables/                    # generated LaTeX table bodies (no hand-typed numbers)
+└── figures/                   # rendered figures (PDF/PNG) and the original plotting scripts
 ```
 
 ## Installation
@@ -65,9 +77,28 @@ python run_all.py          # fixed seed 42; under a minute on a standard worksta
 
 The driver prints a per-domain summary and writes `results/causal_results.json` plus the four CSV files listed above. Because the seed governs every draw — the observational cohort, the interventional samples used for do-calculus, and the bootstrap-free metric computations are all deterministic — a re-run on the same machine reproduces the stdout and the metric values exactly. The doubly-robust estimator and the propensity model come from scikit-learn with fixed inputs, so they too return identical numbers run to run. To redraw the diagrams afterwards, run `python figures/generate_figures.py`.
 
-## Results and figures
+## Audit-cohort analyses (the paper's main results)
 
-The `figures/` directory ships the plotting scripts rather than rendered images, so the descriptions below pair each script with the numbers in `results/` that it visualises. Run `python figures/generate_figures.py` to produce the PNGs.
+Run in this order; times are for a standard laptop.
+
+```bash
+python scripts/unmeasured_confounding.py   # ~6 min  -> proximal_estimates.csv, policy_value_*.csv
+python scripts/proximal_robustness.py      # ~90 min -> proximal_robustness*.csv, proximal_crossing.csv,
+                                           #            proximal_weak_proxies.csv, proximal_nonlinear.csv,
+                                           #            dml_estimates.csv, dag_implication_tests*.csv
+python scripts/seed_replication.py         # ~30 min first run (ten seeds), seconds afterwards
+python scripts/make_unmeasured_figures.py  # figures/fig_proximal_*.pdf, fig_policy_overlap.pdf
+python scripts/make_tables.py              # tables/*.tex, included by the manuscript
+```
+
+Seeds are derived per analysis and replication from base seed 42 plus a per-domain CRC32
+offset, so results do not depend on process order or hash salting. The backdoor comparator
+is reported twice: on age only (`backdoor_observed`) and on age plus both proxies
+(`backdoor_proxy`), the fair competitor for the proximal estimator.
+
+## Verification-cohort figures
+
+The descriptions below pair each original plotting script with the numbers in `results/` that it visualises. Run `python figures/generate_figures.py` to produce them.
 
 - `figures/fig01_causal_dag.py` — draws the shared causal graph (age → severity → treatment, with severity, age and treatment all feeding the outcome). Look at the severity node: it is the single backdoor path that makes the naive estimate biased, and it is the one variable `adjustment_set_identified` flags in `causal_results.json`.
 - `figures/fig02_forest_plot.py` — forest plot of the three ATE estimates against the do-calculus truth, drawn from `results/ate_by_domain.csv`. The take-away is the sign flip: the naive point sits on the positive (harmful) side while true, backdoor, and doubly-robust all sit together on the protective side.
@@ -86,8 +117,8 @@ No patient data is used. Each domain is a synthetic cohort sampled from a struct
 
 ```bibtex
 @article{tritham_causal_cdss,
-  title  = {Structural Causal Models for Evaluating Clinical Decision Support
-            Systems: A Causal Inference Framework},
+  title  = {Auditing Knowledge-Driven Clinical Decision Support under Unmeasured
+            Confounding: A Structural Causal Model Protocol},
   author = {Tritham, Chatchai and Snae Namahoot, Chakkrit},
   year   = {2026},
   note   = {Manuscript under review; to appear}
@@ -100,7 +131,7 @@ Released under the MIT License (see `LICENSE`).
 
 ## Contact
 
-**Chatchai Tritham** — Department of Computer Science and Information Technology, Faculty of Science, Naresuan University, Phitsanulok 65000, Thailand. Email: chatchait66@nu.ac.th · ORCID: 0000-0001-7899-228X
+**Chatchai Tritham** — Department of Computer Science and Information Technology, Faculty of Science, Naresuan University, Phitsanulok 65000, Thailand. Email: chatchai.t@mail.rmutk.ac.th · ORCID: 0000-0001-7899-228X
 **Chakkrit Snae Namahoot** — same affiliation. Email: chakkrits@nu.ac.th · ORCID: 0000-0003-4660-4590
 
 ## Portfolio relationship
