@@ -54,7 +54,7 @@ Outputs: results/proximal_robustness.csv, results/proximal_robustness_w.csv,
          results/proximal_nonlinear.csv, results/dml_estimates.csv,
          results/dag_implication_tests.csv
 
-Usage: python scripts/proximal_robustness.py [--reps 100] [--n 8000]
+Usage: python scripts/proximal_robustness.py [--reps 100] [--n 8000] [--skip-dml]
 """
 from __future__ import annotations
 
@@ -76,25 +76,33 @@ from sklearn.ensemble import (  # noqa: E402
 from sklearn.model_selection import KFold  # noqa: E402
 
 from unmeasured_confounding import (  # noqa: E402
-    DOMAINS, backdoor_observed_ate, backdoor_proxy_se, domain_offset, first_stage_f, ols,
-    proximal_se, sigmoid, true_ate,
+    BRIDGE_FAILS, DOMAINS, backdoor_observed_ate, backdoor_proxy_se, domain_offset,
+    first_stage_f, ols, proximal_dr_only, proximal_se, sigmoid, true_ate,
 )
 
-ESTIMATORS = ("proximal", "backdoor_proxy", "backdoor_observed")
+ESTIMATORS = ("proximal", "backdoor_proxy", "backdoor_observed", "proximal_dr")
 PROXY_SCALES = (1.0, 0.5, 0.25, 0.1)
 
 
 def run_estimators(d: dict, truth: float, acc: dict) -> None:
-    """Append the three estimates (and interval coverage where an SE exists) to ``acc``."""
+    """Append the estimates (and interval coverage where an SE exists) to ``acc``.
+
+    The doubly robust proximal estimator is computed last; it draws no random numbers, so
+    the other estimators' results do not depend on whether it is run.
+    """
     for name, fn in (("proximal", proximal_se), ("backdoor_proxy", backdoor_proxy_se)):
         th, se = fn(d)
         acc[name].append(th)
         acc[name + "_cover"].append(float(abs(th - truth) <= 1.96 * se))
     acc["backdoor_observed"].append(backdoor_observed_ate(d))
+    th, se = proximal_dr_only(d)
+    acc["proximal_dr"].append(th)
+    acc["proximal_dr_cover"].append(float(abs(th - truth) <= 1.96 * se))
 
 
 def new_acc() -> dict:
-    return {k: [] for k in ESTIMATORS + ("proximal_cover", "backdoor_proxy_cover")}
+    return {k: [] for k in ESTIMATORS + ("proximal_cover", "backdoor_proxy_cover",
+                                       "proximal_dr_cover")}
 
 
 def summarise(acc: dict, truth: float, extra: dict) -> list[dict]:
@@ -113,8 +121,8 @@ def summarise(acc: dict, truth: float, extra: dict) -> list[dict]:
     return rows
 
 
-def crossing(rows: list[dict], key: str) -> float | None:
-    """Smallest violation at which proximal |bias| reaches the proxy-adjusted backdoor's.
+def crossing(rows: list[dict], key: str, est: str = "proximal") -> float | None:
+    """Smallest violation at which |bias| of ``est`` reaches the proxy-adjusted backdoor's.
 
     Linear interpolation between grid points; None if no crossing in the swept range.
     """
@@ -122,7 +130,7 @@ def crossing(rows: list[dict], key: str) -> float | None:
     diff = []
     for g in grid:
         b = {r["estimator"]: r["abs_bias"] for r in rows if r[key] == g}
-        diff.append(b["proximal"] - b["backdoor_proxy"])
+        diff.append(b[est] - b["backdoor_proxy"])
     for (g0, d0), (g1, d1) in zip(zip(grid, diff), zip(grid[1:], diff[1:])):
         if d0 < 0 <= d1:
             return round(g0 + (g1 - g0) * (-d0) / (d1 - d0), 3)
@@ -336,6 +344,8 @@ def main() -> None:
     ap.add_argument("--reps", type=int, default=100)
     ap.add_argument("--n", type=int, default=8000)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--skip-dml", action="store_true",
+                    help="skip the slow DML block and leave results/dml_estimates.csv as is")
     args = ap.parse_args()
     RESULTS.mkdir(exist_ok=True)
 
@@ -389,9 +399,14 @@ def main() -> None:
                       "gamma_star": crossing([r for r in rows if r["domain"] == domain],
                                              "gamma_z_to_y"),
                       "delta_star": crossing([r for r in wrows if r["domain"] == domain],
-                                             "delta_a_to_w")})
+                                             "delta_a_to_w"),
+                      "gamma_star_dr": crossing([r for r in rows if r["domain"] == domain],
+                                                "gamma_z_to_y", "proximal_dr"),
+                      "delta_star_dr": crossing([r for r in wrows if r["domain"] == domain],
+                                                "delta_a_to_w", "proximal_dr")})
         print(f"  crossing {domain:8} gamma* {cross[-1]['gamma_star']}  "
-              f"delta* {cross[-1]['delta_star']}", flush=True)
+              f"delta* {cross[-1]['delta_star']}  gamma*_dr {cross[-1]['gamma_star_dr']}  "
+              f"delta*_dr {cross[-1]['delta_star_dr']}", flush=True)
     with open(RESULTS / "proximal_crossing.csv", "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=list(cross[0]))
         w.writeheader()
@@ -450,9 +465,12 @@ def main() -> None:
         w.writerows(nl_rows)
     print("wrote results/proximal_nonlinear.csv")
 
+    print(f"treatment-bridge GMM non-convergence: {BRIDGE_FAILS['count']} of "
+          f"{BRIDGE_FAILS['calls']} arm-level solves", flush=True)
+
     # ---------------------------------------------------------------- 2. DML
     dml_rows = []
-    for domain, cfg in DOMAINS.items():
+    for domain, cfg in ({} if args.skip_dml else DOMAINS).items():
         truth = true_ate(cfg, 200_000, np.random.default_rng(args.seed + 999))
         for score in ("aipw", "plr"):
             for label, covs in (("oracle_severity_recorded", ["age", "severity"]),
@@ -474,11 +492,12 @@ def main() -> None:
                                  "reps": len(ests), "n": args.n})
                 print(f"  DML {domain:8} {score:4} {label:26} bias {dml_rows[-1]['bias']:+.4f} "
                       f"coverage {dml_rows[-1]['ci95_coverage']}", flush=True)
-    with open(RESULTS / "dml_estimates.csv", "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(dml_rows[0]))
-        w.writeheader()
-        w.writerows(dml_rows)
-    print("wrote results/dml_estimates.csv")
+    if dml_rows:
+        with open(RESULTS / "dml_estimates.csv", "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(dml_rows[0]))
+            w.writeheader()
+            w.writerows(dml_rows)
+        print("wrote results/dml_estimates.csv")
 
     # ---------------------------------------------------------------- 3. DAG implications
     dag_rows = []

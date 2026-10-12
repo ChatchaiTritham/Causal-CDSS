@@ -17,7 +17,8 @@ OUT.mkdir(exist_ok=True)
 
 DOM = {"sepsis": "Sepsis", "ards": "ARDS", "cardiac": "ACS"}
 EST = {"naive": "Naive", "backdoor_observed": "Backdoor, age only",
-       "backdoor_proxy": "Backdoor, age $+$ $Z$, $W$", "proximal": "\\textbf{Proximal}"}
+       "backdoor_proxy": "Backdoor, age $+$ $Z$, $W$", "proximal": "\\textbf{Proximal}",
+       "proximal_ipw": "Proximal IPW", "proximal_dr": "\\textbf{Proximal DR}"}
 POL = {"treat_all": "Treat all", "treat_none": "Treat none",
        "cdss_top50": "Risk rule, top 50\\%", "cdss_top25": "Risk rule, top 25\\%",
        "knowledge": "Knowledge-driven rule"}
@@ -44,7 +45,7 @@ def tab_proximal() -> None:
             r = g.loc[k]
             lines.append(f"{nice if i == 0 else ''} & {lab} & {f(r.mean_estimate, 3, True)} & "
                          f"{f(r.bias, 3, True)} & {f(r.mcse_bias, 4)} & {f(r.rmse)} & "
-                         f"{f(r.ci95_coverage, 2) if k in ('proximal', 'backdoor_proxy') else '---'} \\\\")
+                         f"{f(r.ci95_coverage, 2) if k not in ('naive', 'backdoor_observed') else '---'} \\\\")
         lines.append("\\midrule" if dom != "cardiac" else "")
     write("tab_proximal.tex", "\n".join(l for l in lines if l))
 
@@ -120,12 +121,16 @@ def tab_sweep(fname: str, key: str, out: str) -> None:
     lines = []
     for dom, nice in DOM.items():
         for i, (e, lab) in enumerate((("proximal", "Proximal"), ("backdoor_proxy", "Backdoor, age $+$ $Z$, $W$"),
-                                      ("backdoor_observed", "Backdoor, age only"))):
+                                      ("backdoor_observed", "Backdoor, age only"),
+                                      ("proximal_dr", "Proximal DR"))):
             g = d[(d.domain == dom) & (d.estimator == e)].set_index(key)
             lines.append(f"{nice if i == 0 else ''} & {lab} & "
                          + " & ".join(f(g.loc[x, "abs_bias"]) for x in grid) + " \\\\")
         g = d[(d.domain == dom) & (d.estimator == "proximal")].set_index(key)
         lines.append(" & \\emph{Proximal 95\\% coverage} & "
+                     + " & ".join(f(g.loc[x, "ci95_coverage"], 2) for x in grid) + " \\\\")
+        g = d[(d.domain == dom) & (d.estimator == "proximal_dr")].set_index(key)
+        lines.append(" & \\emph{Proximal DR 95\\% coverage} & "
                      + " & ".join(f(g.loc[x, "ci95_coverage"], 2) for x in grid) + " \\\\")
         if dom != "cardiac":
             lines.append("\\midrule")
@@ -135,7 +140,8 @@ def tab_sweep(fname: str, key: str, out: str) -> None:
 def tab_crossing() -> None:
     d = pd.read_csv(RES / "proximal_crossing.csv")
     write("tab_crossing.tex", "\n".join(
-        f"{DOM[r.domain]} & {f(r.gamma_star, 2)} & {f(r.delta_star, 2)} \\\\" for r in d.itertuples()))
+        f"{DOM[r.domain]} & {f(r.gamma_star, 2)} & {f(r.delta_star, 2)} & "
+        f"{f(r.gamma_star_dr, 2)} & {f(r.delta_star_dr, 2)} \\\\" for r in d.itertuples()))
 
 
 def tab_nonlinear() -> None:
@@ -149,7 +155,9 @@ def tab_nonlinear() -> None:
             lines.append(f"{nice if i == 0 else ''} & {lab} & {f(g.loc['proximal', 'true_ate'], 3, True)} & "
                          f"{f(g.loc['proximal', 'abs_bias'], 4)} & {f(g.loc['proximal', 'mcse_bias'], 4)} & "
                          f"{f(g.loc['proximal', 'ci95_coverage'], 2)} & "
-                         f"{f(g.loc['backdoor_proxy', 'abs_bias'], 3)} & {f(g.loc['backdoor_observed', 'abs_bias'], 3)} \\\\")
+                         f"{f(g.loc['backdoor_proxy', 'abs_bias'], 3)} & {f(g.loc['backdoor_observed', 'abs_bias'], 3)} & "
+                         f"{f(g.loc['proximal_dr', 'abs_bias'], 4)} & "
+                         f"{f(g.loc['proximal_dr', 'ci95_coverage'], 2)} \\\\")
         if dom != "cardiac":
             lines.append("\\midrule")
     write("tab_nonlinear.tex", "\n".join(lines))
@@ -163,7 +171,9 @@ def tab_weak() -> None:
             g = d[(d.domain == dom) & (d.proxy_scale == s)].set_index("estimator")
             p = g.loc["proximal"]
             lines.append(f"{nice if i == 0 else ''} & {s:g} & {p.first_stage_f:.1f} & {f(p.bias, 3, True)} & "
-                         f"{f(p.sd)} & {f(p.ci95_coverage, 2)} & {f(g.loc['backdoor_proxy', 'bias'], 3, True)} \\\\")
+                         f"{f(p.sd)} & {f(p.ci95_coverage, 2)} & {f(g.loc['backdoor_proxy', 'bias'], 3, True)} & "
+                         f"{f(g.loc['proximal_dr', 'bias'], 3, True)} & {f(g.loc['proximal_dr', 'sd'])} & "
+                         f"{f(g.loc['proximal_dr', 'ci95_coverage'], 2)} \\\\")
         if dom != "cardiac":
             lines.append("\\midrule")
     write("tab_weak.tex", "\n".join(lines))
