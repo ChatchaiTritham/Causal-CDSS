@@ -196,6 +196,15 @@ def tab_models() -> None:
     write("tab_models.tex", "\n".join(lines))
 
 
+def tab_bootstrap() -> None:
+    d = pd.read_csv(RES / "proximal_bootstrap_summary.csv")
+    name = {"proximal_2sls": "Proximal 2SLS", "proximal_dr": "Proximal DR"}
+    write("tab_bootstrap.tex", "\n".join(
+        f"{DOM[r.domain]} & {name[r.estimator]} & {f(r.emp_sd, 4)} & {f(r.mean_plugin_se, 4)} & "
+        f"{f(r.mean_boot_se, 4)} & {f(r.cov_plugin, 2)} & {f(r.cov_boot_wald, 2)} & "
+        f"{f(r.cov_boot_pct, 2)} \\\\" for r in d.itertuples()))
+
+
 if __name__ == "__main__":
     tab_proximal()
     tab_ope()
@@ -210,3 +219,5 @@ if __name__ == "__main__":
         tab_dml()
     if "holds_bonferroni" in pd.read_csv(RES / "dag_implication_tests.csv").columns:
         tab_dag()
+    if (RES / "proximal_bootstrap_summary.csv").exists():
+        tab_bootstrap()

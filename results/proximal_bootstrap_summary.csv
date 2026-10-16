@@ -1,0 +1,7 @@
+domain,estimator,reps,emp_sd,mean_plugin_se,mean_boot_se,cov_plugin,cov_boot_wald,cov_boot_pct
+sepsis,proximal_2sls,100,0.0131,0.01317,0.01323,0.92,0.93,0.9
+sepsis,proximal_dr,100,0.01942,0.0189,0.01825,0.94,0.93,0.91
+ards,proximal_2sls,100,0.01164,0.01264,0.01268,0.95,0.95,0.95
+ards,proximal_dr,100,0.01316,0.01453,0.0146,0.96,0.96,0.93
+cardiac,proximal_2sls,100,0.01291,0.01335,0.01344,0.76,0.78,0.74
+cardiac,proximal_dr,100,0.02326,0.02253,0.02108,0.93,0.93,0.85
