@@ -200,8 +200,29 @@ def t_misc():
                           for _, r in c.iterrows()])
 
 
+def t_rule_v2():
+    d = pd.read_csv(RES / "v2_rule_summary.csv")
+    L = []
+    for _, r in d.iterrows():
+        st = "A" if r.set.startswith("A") else "B (fresh)"
+        cc = "---" if r.strategy == "always 2SLS" else f"{f(r.correct_all_reps, 2)}"
+        ci = "---" if r.strategy == "always 2SLS" else r.correct_all_ci.replace("-", "--")
+        L.append(f"{st} & {r.strategy.replace('v2 (DR default + flags)', 'v2 (DR default, flags)')} & {cc} & {ci} & "
+                 f"{f(r.inconclusive, 2)} & {f(r.mean_rmse, 3)} & {f(r.mean_regret, 3)} & "
+                 f"${r.regret_minus_dr_ci.replace(' to ', ', ')}$ & {f(r.coverage, 2)} " + chr(92) * 2)
+    write("v2_rule.tex", L)
+    w = pd.read_csv(RES / "v2_weak_valid.csv")
+    w = w[w.reps >= 30]
+    fb = {"<16": "$<$16", "16-104.7": "16--104.7", ">=104.7": "$\geq$104.7"}
+    write("v2_weak.tex", [f"{r.loading:.2f} & {fb[r.F_bin]} & {r.reps} & "
+                          f"{r.F_median:.0f} & {f(r.wald_2sls_cov, 3)} & {f(r.ar_cov, 3)} & {f(r.ar_infinite, 3)} & "
+                          f"{f(r.dr_cov_converged, 3)} & {r.q_nonconverged} " + chr(92) * 2 for _, r in w.iterrows()])
+
+
 def main():
     OUT.mkdir(exist_ok=True)
+    if (RES / "v2_rule_summary.csv").exists():
+        t_rule_v2()
     for fn, need in ((t_nlh, "r2_bridge_nonlinear.csv"), (t_pv, "r2_policy_value_bootstrap.csv"),
                      (t_calib, "r2_calibrated.csv"), (t_harm, "r2_harm_decision_curve.csv"),
                      (t_lhs, "r2_lhs_design.csv"), (t_falsify, "r2_falsification_size_power.csv"),

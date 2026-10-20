@@ -1,6 +1,6 @@
 # Reproducibility
 
-## Paper traceability first (KBS manuscript, release v1.0.4)
+## Paper traceability first (KBS manuscript, release v1.0.5)
 
 Run `python scripts/run_paper.py` to regenerate only the files the paper uses and check them
 against `results/SHA256SUMS_paper`. Legacy files are hashed separately in
@@ -168,6 +168,14 @@ Research software for method comparison on synthetic data. It is not a validated
 medical-device tool (IEC 62304 / ISO 13485 4.1.6 tool validation has not been performed).
 Credibility evidence is limited to code verification: seeded reproduction of every table and
 the unit tests in `tests/`. Environment: `requirements.txt` (pinned).
+
+## v1.0.5 (2026-10-21): revised decision rule
+
+`python scripts/decision_rule_v2.py` (seeds: LHS 2027 and 2031; replication seed
+design_seed*1000 + 5,000,000 + 10,000*generator + replication) regenerates main-text Table
+"Estimator-selection strategies" and Supplementary Section S23; `--part weak` regenerates the
+weak-proxy AR table; `python scripts/make_tables_r2.py` writes the LaTeX bodies. The legacy
+verification cohort (`run_all.py`, `scripts/model_comparison.py`) is no longer in the supplement.
 
 ## v1.0.4 (2026-10-21): second review round
 

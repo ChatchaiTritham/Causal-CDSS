@@ -1,0 +1,361 @@
+set,gen,F_bin,n,wald_hits,ar_hits,ar_infinite
+"A (seed 2027, used in v1 test)",0,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",0,>=104.7,40,4,14,0
+"A (seed 2027, used in v1 test)",0,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",1,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",1,>=104.7,40,37,39,0
+"A (seed 2027, used in v1 test)",1,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",2,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",2,>=104.7,40,5,10,0
+"A (seed 2027, used in v1 test)",2,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",3,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",3,>=104.7,40,28,33,0
+"A (seed 2027, used in v1 test)",3,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",4,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",4,>=104.7,40,4,8,0
+"A (seed 2027, used in v1 test)",4,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",5,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",5,>=104.7,40,35,37,0
+"A (seed 2027, used in v1 test)",5,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",6,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",6,>=104.7,40,17,27,0
+"A (seed 2027, used in v1 test)",6,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",7,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",7,>=104.7,40,35,39,0
+"A (seed 2027, used in v1 test)",7,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",8,16-104.7,1,0,0,0
+"A (seed 2027, used in v1 test)",8,>=104.7,39,0,0,0
+"A (seed 2027, used in v1 test)",8,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",9,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",9,>=104.7,40,36,40,0
+"A (seed 2027, used in v1 test)",9,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",10,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",10,>=104.7,40,14,29,0
+"A (seed 2027, used in v1 test)",10,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",11,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",11,>=104.7,40,24,35,0
+"A (seed 2027, used in v1 test)",11,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",12,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",12,>=104.7,40,13,28,0
+"A (seed 2027, used in v1 test)",12,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",13,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",13,>=104.7,40,29,35,0
+"A (seed 2027, used in v1 test)",13,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",14,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",14,>=104.7,40,36,39,0
+"A (seed 2027, used in v1 test)",14,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",15,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",15,>=104.7,40,14,25,0
+"A (seed 2027, used in v1 test)",15,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",16,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",16,>=104.7,40,0,1,0
+"A (seed 2027, used in v1 test)",16,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",17,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",17,>=104.7,40,0,1,0
+"A (seed 2027, used in v1 test)",17,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",18,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",18,>=104.7,40,15,27,0
+"A (seed 2027, used in v1 test)",18,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",19,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",19,>=104.7,40,22,29,0
+"A (seed 2027, used in v1 test)",19,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",20,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",20,>=104.7,40,8,15,0
+"A (seed 2027, used in v1 test)",20,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",21,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",21,>=104.7,40,25,31,0
+"A (seed 2027, used in v1 test)",21,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",22,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",22,>=104.7,40,21,26,0
+"A (seed 2027, used in v1 test)",22,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",23,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",23,>=104.7,40,14,20,0
+"A (seed 2027, used in v1 test)",23,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",24,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",24,>=104.7,40,1,13,0
+"A (seed 2027, used in v1 test)",24,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",25,16-104.7,2,0,0,0
+"A (seed 2027, used in v1 test)",25,>=104.7,38,2,12,0
+"A (seed 2027, used in v1 test)",25,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",26,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",26,>=104.7,40,0,3,0
+"A (seed 2027, used in v1 test)",26,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",27,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",27,>=104.7,40,38,40,0
+"A (seed 2027, used in v1 test)",27,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",28,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",28,>=104.7,40,0,0,0
+"A (seed 2027, used in v1 test)",28,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",29,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",29,>=104.7,40,40,40,0
+"A (seed 2027, used in v1 test)",29,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",30,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",30,>=104.7,40,40,40,0
+"A (seed 2027, used in v1 test)",30,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",31,16-104.7,2,0,0,0
+"A (seed 2027, used in v1 test)",31,>=104.7,38,6,8,0
+"A (seed 2027, used in v1 test)",31,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",32,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",32,>=104.7,40,38,40,0
+"A (seed 2027, used in v1 test)",32,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",33,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",33,>=104.7,40,4,9,0
+"A (seed 2027, used in v1 test)",33,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",34,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",34,>=104.7,40,16,28,0
+"A (seed 2027, used in v1 test)",34,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",35,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",35,>=104.7,40,36,39,0
+"A (seed 2027, used in v1 test)",35,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",36,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",36,>=104.7,40,0,2,0
+"A (seed 2027, used in v1 test)",36,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",37,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",37,>=104.7,40,2,6,0
+"A (seed 2027, used in v1 test)",37,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",38,16-104.7,20,0,0,0
+"A (seed 2027, used in v1 test)",38,>=104.7,20,0,0,0
+"A (seed 2027, used in v1 test)",38,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",39,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",39,>=104.7,40,15,26,0
+"A (seed 2027, used in v1 test)",39,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",40,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",40,>=104.7,40,14,32,0
+"A (seed 2027, used in v1 test)",40,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",41,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",41,>=104.7,40,6,19,0
+"A (seed 2027, used in v1 test)",41,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",42,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",42,>=104.7,40,17,24,0
+"A (seed 2027, used in v1 test)",42,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",43,16-104.7,6,0,0,0
+"A (seed 2027, used in v1 test)",43,>=104.7,34,0,2,0
+"A (seed 2027, used in v1 test)",43,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",44,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",44,>=104.7,40,10,18,0
+"A (seed 2027, used in v1 test)",44,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",45,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",45,>=104.7,40,0,3,0
+"A (seed 2027, used in v1 test)",45,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",46,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",46,>=104.7,40,39,40,0
+"A (seed 2027, used in v1 test)",46,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",47,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",47,>=104.7,40,34,37,0
+"A (seed 2027, used in v1 test)",47,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",48,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",48,>=104.7,40,3,6,0
+"A (seed 2027, used in v1 test)",48,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",49,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",49,>=104.7,40,0,0,0
+"A (seed 2027, used in v1 test)",49,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",50,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",50,>=104.7,40,2,6,0
+"A (seed 2027, used in v1 test)",50,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",51,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",51,>=104.7,40,7,20,0
+"A (seed 2027, used in v1 test)",51,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",52,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",52,>=104.7,40,4,13,0
+"A (seed 2027, used in v1 test)",52,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",53,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",53,>=104.7,40,37,40,0
+"A (seed 2027, used in v1 test)",53,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",54,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",54,>=104.7,40,25,38,0
+"A (seed 2027, used in v1 test)",54,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",55,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",55,>=104.7,40,0,0,0
+"A (seed 2027, used in v1 test)",55,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",56,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",56,>=104.7,40,0,0,0
+"A (seed 2027, used in v1 test)",56,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",57,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",57,>=104.7,40,29,36,0
+"A (seed 2027, used in v1 test)",57,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",58,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",58,>=104.7,40,36,38,0
+"A (seed 2027, used in v1 test)",58,<16,0,0,0,0
+"A (seed 2027, used in v1 test)",59,16-104.7,0,0,0,0
+"A (seed 2027, used in v1 test)",59,>=104.7,40,37,40,0
+"A (seed 2027, used in v1 test)",59,<16,0,0,0,0
+"B (seed 2031, fresh)",0,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",0,>=104.7,40,39,40,0
+"B (seed 2031, fresh)",0,<16,0,0,0,0
+"B (seed 2031, fresh)",1,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",1,>=104.7,40,8,24,0
+"B (seed 2031, fresh)",1,<16,0,0,0,0
+"B (seed 2031, fresh)",2,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",2,>=104.7,40,19,31,0
+"B (seed 2031, fresh)",2,<16,0,0,0,0
+"B (seed 2031, fresh)",3,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",3,>=104.7,40,0,0,0
+"B (seed 2031, fresh)",3,<16,0,0,0,0
+"B (seed 2031, fresh)",4,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",4,>=104.7,40,32,36,0
+"B (seed 2031, fresh)",4,<16,0,0,0,0
+"B (seed 2031, fresh)",5,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",5,>=104.7,40,8,17,0
+"B (seed 2031, fresh)",5,<16,0,0,0,0
+"B (seed 2031, fresh)",6,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",6,>=104.7,40,39,40,0
+"B (seed 2031, fresh)",6,<16,0,0,0,0
+"B (seed 2031, fresh)",7,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",7,>=104.7,40,34,38,0
+"B (seed 2031, fresh)",7,<16,0,0,0,0
+"B (seed 2031, fresh)",8,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",8,>=104.7,40,20,29,0
+"B (seed 2031, fresh)",8,<16,0,0,0,0
+"B (seed 2031, fresh)",9,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",9,>=104.7,40,27,31,0
+"B (seed 2031, fresh)",9,<16,0,0,0,0
+"B (seed 2031, fresh)",10,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",10,>=104.7,40,38,40,0
+"B (seed 2031, fresh)",10,<16,0,0,0,0
+"B (seed 2031, fresh)",11,16-104.7,5,0,0,0
+"B (seed 2031, fresh)",11,>=104.7,35,8,21,0
+"B (seed 2031, fresh)",11,<16,0,0,0,0
+"B (seed 2031, fresh)",12,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",12,>=104.7,40,31,36,0
+"B (seed 2031, fresh)",12,<16,0,0,0,0
+"B (seed 2031, fresh)",13,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",13,>=104.7,40,36,38,0
+"B (seed 2031, fresh)",13,<16,0,0,0,0
+"B (seed 2031, fresh)",14,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",14,>=104.7,40,4,10,0
+"B (seed 2031, fresh)",14,<16,0,0,0,0
+"B (seed 2031, fresh)",15,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",15,>=104.7,40,10,19,0
+"B (seed 2031, fresh)",15,<16,0,0,0,0
+"B (seed 2031, fresh)",16,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",16,>=104.7,40,14,20,0
+"B (seed 2031, fresh)",16,<16,0,0,0,0
+"B (seed 2031, fresh)",17,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",17,>=104.7,40,20,34,0
+"B (seed 2031, fresh)",17,<16,0,0,0,0
+"B (seed 2031, fresh)",18,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",18,>=104.7,40,36,38,0
+"B (seed 2031, fresh)",18,<16,0,0,0,0
+"B (seed 2031, fresh)",19,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",19,>=104.7,40,35,40,0
+"B (seed 2031, fresh)",19,<16,0,0,0,0
+"B (seed 2031, fresh)",20,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",20,>=104.7,40,35,39,0
+"B (seed 2031, fresh)",20,<16,0,0,0,0
+"B (seed 2031, fresh)",21,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",21,>=104.7,40,0,0,0
+"B (seed 2031, fresh)",21,<16,0,0,0,0
+"B (seed 2031, fresh)",22,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",22,>=104.7,40,0,0,0
+"B (seed 2031, fresh)",22,<16,0,0,0,0
+"B (seed 2031, fresh)",23,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",23,>=104.7,40,14,26,0
+"B (seed 2031, fresh)",23,<16,0,0,0,0
+"B (seed 2031, fresh)",24,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",24,>=104.7,40,35,39,0
+"B (seed 2031, fresh)",24,<16,0,0,0,0
+"B (seed 2031, fresh)",25,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",25,>=104.7,40,7,21,0
+"B (seed 2031, fresh)",25,<16,0,0,0,0
+"B (seed 2031, fresh)",26,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",26,>=104.7,40,0,0,0
+"B (seed 2031, fresh)",26,<16,0,0,0,0
+"B (seed 2031, fresh)",27,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",27,>=104.7,40,0,0,0
+"B (seed 2031, fresh)",27,<16,0,0,0,0
+"B (seed 2031, fresh)",28,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",28,>=104.7,40,39,40,0
+"B (seed 2031, fresh)",28,<16,0,0,0,0
+"B (seed 2031, fresh)",29,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",29,>=104.7,40,13,17,0
+"B (seed 2031, fresh)",29,<16,0,0,0,0
+"B (seed 2031, fresh)",30,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",30,>=104.7,40,2,12,0
+"B (seed 2031, fresh)",30,<16,0,0,0,0
+"B (seed 2031, fresh)",31,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",31,>=104.7,40,36,40,0
+"B (seed 2031, fresh)",31,<16,0,0,0,0
+"B (seed 2031, fresh)",32,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",32,>=104.7,40,29,38,0
+"B (seed 2031, fresh)",32,<16,0,0,0,0
+"B (seed 2031, fresh)",33,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",33,>=104.7,40,30,36,0
+"B (seed 2031, fresh)",33,<16,0,0,0,0
+"B (seed 2031, fresh)",34,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",34,>=104.7,40,29,35,0
+"B (seed 2031, fresh)",34,<16,0,0,0,0
+"B (seed 2031, fresh)",35,16-104.7,3,2,3,0
+"B (seed 2031, fresh)",35,>=104.7,37,35,37,0
+"B (seed 2031, fresh)",35,<16,0,0,0,0
+"B (seed 2031, fresh)",36,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",36,>=104.7,40,34,38,0
+"B (seed 2031, fresh)",36,<16,0,0,0,0
+"B (seed 2031, fresh)",37,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",37,>=104.7,40,0,0,0
+"B (seed 2031, fresh)",37,<16,0,0,0,0
+"B (seed 2031, fresh)",38,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",38,>=104.7,40,28,33,0
+"B (seed 2031, fresh)",38,<16,0,0,0,0
+"B (seed 2031, fresh)",39,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",39,>=104.7,40,24,31,0
+"B (seed 2031, fresh)",39,<16,0,0,0,0
+"B (seed 2031, fresh)",40,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",40,>=104.7,40,23,34,0
+"B (seed 2031, fresh)",40,<16,0,0,0,0
+"B (seed 2031, fresh)",41,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",41,>=104.7,40,11,18,0
+"B (seed 2031, fresh)",41,<16,0,0,0,0
+"B (seed 2031, fresh)",42,16-104.7,40,16,23,0
+"B (seed 2031, fresh)",42,>=104.7,0,0,0,0
+"B (seed 2031, fresh)",42,<16,0,0,0,0
+"B (seed 2031, fresh)",43,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",43,>=104.7,40,11,22,0
+"B (seed 2031, fresh)",43,<16,0,0,0,0
+"B (seed 2031, fresh)",44,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",44,>=104.7,40,2,12,0
+"B (seed 2031, fresh)",44,<16,0,0,0,0
+"B (seed 2031, fresh)",45,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",45,>=104.7,40,11,15,0
+"B (seed 2031, fresh)",45,<16,0,0,0,0
+"B (seed 2031, fresh)",46,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",46,>=104.7,40,0,1,0
+"B (seed 2031, fresh)",46,<16,0,0,0,0
+"B (seed 2031, fresh)",47,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",47,>=104.7,40,19,30,0
+"B (seed 2031, fresh)",47,<16,0,0,0,0
+"B (seed 2031, fresh)",48,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",48,>=104.7,40,38,40,0
+"B (seed 2031, fresh)",48,<16,0,0,0,0
+"B (seed 2031, fresh)",49,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",49,>=104.7,40,40,40,0
+"B (seed 2031, fresh)",49,<16,0,0,0,0
+"B (seed 2031, fresh)",50,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",50,>=104.7,40,38,39,0
+"B (seed 2031, fresh)",50,<16,0,0,0,0
+"B (seed 2031, fresh)",51,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",51,>=104.7,40,2,11,0
+"B (seed 2031, fresh)",51,<16,0,0,0,0
+"B (seed 2031, fresh)",52,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",52,>=104.7,40,6,10,0
+"B (seed 2031, fresh)",52,<16,0,0,0,0
+"B (seed 2031, fresh)",53,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",53,>=104.7,40,39,40,0
+"B (seed 2031, fresh)",53,<16,0,0,0,0
+"B (seed 2031, fresh)",54,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",54,>=104.7,40,9,21,0
+"B (seed 2031, fresh)",54,<16,0,0,0,0
+"B (seed 2031, fresh)",55,16-104.7,40,3,20,0
+"B (seed 2031, fresh)",55,>=104.7,0,0,0,0
+"B (seed 2031, fresh)",55,<16,0,0,0,0
+"B (seed 2031, fresh)",56,16-104.7,3,3,3,0
+"B (seed 2031, fresh)",56,>=104.7,37,27,35,0
+"B (seed 2031, fresh)",56,<16,0,0,0,0
+"B (seed 2031, fresh)",57,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",57,>=104.7,40,0,1,0
+"B (seed 2031, fresh)",57,<16,0,0,0,0
+"B (seed 2031, fresh)",58,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",58,>=104.7,40,16,26,0
+"B (seed 2031, fresh)",58,<16,0,0,0,0
+"B (seed 2031, fresh)",59,16-104.7,0,0,0,0
+"B (seed 2031, fresh)",59,>=104.7,40,32,37,0
+"B (seed 2031, fresh)",59,<16,0,0,0,0
