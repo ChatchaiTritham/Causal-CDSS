@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.0.6 (2026-10-21)
+- scripts/default_loss_audit.py: pre-stated interval-score loss over all three estimator families,
+  DR coverage strata, bias/SE decomposition, flag AUC, disagreement-widened interval, AR boundedness.
+- tests/test_default_loss_audit.py.
+
 ## v1.0.5 (2026-10-21)
 
 - `scripts/decision_rule_v2.py`: revised audit decision rule (DR proximal by default, inconclusive

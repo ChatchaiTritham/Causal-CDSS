@@ -1,6 +1,6 @@
 # Reproducibility
 
-## Paper traceability first (KBS manuscript, release v1.0.5)
+## Paper traceability first (KBS manuscript, release v1.0.6)
 
 Run `python scripts/run_paper.py` to regenerate only the files the paper uses and check them
 against `results/SHA256SUMS_paper`. Legacy files are hashed separately in
@@ -194,3 +194,20 @@ verification cohort (`run_all.py`, `scripts/model_comparison.py`) is no longer i
 - `requirements-lock.txt` -- full pinned environment (pip freeze) of the run.
 - Not developed under IEC 62304:2006+A1:2015 and not validated as production software under
   ISO 13485:2016 clause 4.1.6.
+
+## v1.0.6 (2026-10-21): pre-stated loss and default audit (no new simulation)
+
+`python scripts/default_loss_audit.py` re-scores the stored replications in
+`results/v2_rule_reps.csv` (about 30 s). Scoring rules, written here before the script was run:
+
+* primary loss: 95% interval score (Gneiting & Raftery 2007); secondary loss: RMSE.
+  The RMSE ranking of the fixed families was already known from v1.0.5; the interval-score
+  ranking was not.
+* "best family" is scored over all three families (proxy, 2SLS, DR), per generator.
+* every replication is scored (v1.0.5 convention). Up to v1.0.4 the "right" share counted
+  converged replications only, which gave always-DR 0.65 on set A; the v1.0.5+ all-replication
+  convention gives 0.57.
+
+Outputs: `results/default_loss_summary.csv`, `default_loss_strata.csv` (DR coverage by U2/rho_zw,
+SD/SE and |bias|/SD, disagreement-widened interval, flag AUC), `default_loss_generators.csv`,
+`ar_bounded.csv`.
