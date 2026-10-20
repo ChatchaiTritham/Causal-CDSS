@@ -87,6 +87,11 @@ python scripts/proximal_robustness.py      # ~90 min -> proximal_robustness*.csv
                                            #            proximal_weak_proxies.csv, proximal_nonlinear.csv,
                                            #            dml_estimates.csv, dag_implication_tests*.csv
 python scripts/seed_replication.py         # ~30 min first run (ten seeds), seconds afterwards
+python scripts/proximal_bootstrap.py      # bootstrap check of proximal SEs -> proximal_bootstrap*.csv
+python scripts/sample_size.py             # ~5 min  -> sample_size.csv (n = 1,000 ... 16,000)
+python scripts/proximal_policy_subgroup.py # ~1 min -> proximal_policy_value.csv, subgroup_audit.csv
+python scripts/proximal_policy_violation.py # ~2 min -> proximal_policy_violation.csv
+python scripts/audit_card.py              # one audit run per domain -> audit_card.json
 python scripts/make_unmeasured_figures.py  # figures/fig_proximal_*.pdf, fig_policy_overlap.pdf
 python scripts/make_tables.py              # tables/*.tex, included by the manuscript
 ```

@@ -232,6 +232,55 @@ def tab_audit_card() -> None:
     write("card_sepsis.json", json.dumps(cards[0], indent=1))
 
 
+def tab_proximal_ope() -> None:
+    d = pd.read_csv(RES / "proximal_policy_value.csv")
+    pol = dict(POL, age_rule="Age rule (age $>0$)")
+    lines = []
+    for p in ["age_rule", "treat_all", "treat_none", "cdss_top50", "cdss_top25", "knowledge"]:
+        g = d[d.policy == p]
+        rng = lambda c: f"{f(g[c].min(), 2)}--{f(g[c].max(), 2)}"
+        lines.append(f"{pol[p]} & {'yes' if g.identified.iloc[0] else 'no'} & "
+                     f"{f(g.dr_bias.abs().max(), 3)} & {rng('dr_coverage')} & "
+                     f"{f(g.prox_bias.abs().max(), 3)} & {rng('prox_coverage')} \\\\")
+    write("tab_proximal_ope.tex", "\n".join(lines))
+
+
+def tab_subgroup() -> None:
+    d = pd.read_csv(RES / "subgroup_audit.csv")
+    grp = {"young": "Youngest", "middle": "Middle", "old": "Oldest"}
+    lines = []
+    for dm in DOM:
+        for i, (k, lab) in enumerate(grp.items()):
+            g = d[(d.domain == dm) & (d.age_group == k)].set_index("item")
+            bp, dr = g.loc["backdoor_proxy"], g.loc["proximal_dr"]
+            kn, rr = g.loc["knowledge"], g.loc["cdss_top50"]
+            lines.append(f"{DOM[dm] if i == 0 else ''} & {lab} & {f(bp.truth, 3, True)} & "
+                         f"{f(bp.coverage, 2)} & {f(dr.coverage, 2)} & {f(kn.benefit_share, 2)} & "
+                         f"{f(kn.benefit_recall, 2)} & {f(rr.benefit_recall, 2)} & "
+                         f"{f(kn.risk_reduction, 3)} & {f(rr.risk_reduction, 3)} \\\\")
+        if dm != "cardiac":
+            lines.append(r"\midrule")
+    write("tab_subgroup.tex", "\n".join(lines))
+
+
+
+def tab_policy_violation() -> None:
+    d = pd.read_csv(RES / "proximal_policy_violation.csv")
+    pol = {"age_rule": "Age rule (age $>0$)", "cdss_top50": "Risk rule, top 50\%",
+           "knowledge": "Knowledge-driven rule"}
+    sym = {"gamma": r"$\gamma$ ($Z \to Y$)", "delta": r"$\delta$ ($T \to W$)"}
+    lines = []
+    for k in ("gamma", "delta"):
+        for i, (p, lab) in enumerate(pol.items()):
+            cells = []
+            for lv in sorted(d.level.unique()):
+                g = d[(d.violation == k) & (d.policy == p) & (d.level == lv)]
+                cells.append(f"{f(g.prox_bias.abs().max(), 3)} / {f(g.prox_coverage.min(), 2)}")
+            lines.append(f"{sym[k] if i == 0 else ''} & {lab} & " + " & ".join(cells) + " \\\\")
+        if k == "gamma":
+            lines.append(r"\midrule")
+    write("tab_policy_violation.tex", "\n".join(lines))
+
 if __name__ == "__main__":
     tab_proximal()
     tab_ope()
@@ -252,3 +301,8 @@ if __name__ == "__main__":
         tab_sample_size()
     if (RES / "audit_card.json").exists():
         tab_audit_card()
+    if (RES / "proximal_policy_value.csv").exists():
+        tab_proximal_ope()
+        tab_subgroup()
+    if (RES / "proximal_policy_violation.csv").exists():
+        tab_policy_violation()

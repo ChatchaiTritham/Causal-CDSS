@@ -267,6 +267,65 @@ def fig_sample_size() -> None:
     print("wrote figures/fig_sample_size.pdf")
 
 
+def fig_proximal_ope() -> None:
+    """(a) Interval coverage of the policy value, standard DR vs proximal DR, per rule and domain
+    (results/proximal_policy_value.csv); (b) benefit recall of the two recommenders by age
+    tertile (results/subgroup_audit.csv)."""
+    pv, sg = RES / "proximal_policy_value.csv", RES / "subgroup_audit.csv"
+    if not (pv.exists() and sg.exists()):
+        return
+    d = pd.read_csv(pv)
+    s = pd.read_csv(sg)
+    order = ["age_rule", "treat_all", "treat_none", "cdss_top50", "cdss_top25", "knowledge"]
+    lab = dict(NICE_POLICY, age_rule="Age rule (age > 0)")
+    mk = {"sepsis": "o", "ards": "s", "cardiac": "^"}
+    off = {"sepsis": -0.22, "ards": 0.0, "cardiac": 0.22}
+    fig, (a, b) = plt.subplots(1, 2, figsize=(6.4, 2.9), gridspec_kw={"width_ratios": [1.25, 1]})
+    for i, p in enumerate(order):
+        for dm, m in mk.items():
+            r = d[(d.policy == p) & (d.domain == dm)].iloc[0]
+            y = i + off[dm]
+            a.plot([r.dr_coverage, r.prox_coverage], [y, y], color="0.75", lw=0.8, zorder=1)
+            a.scatter(r.dr_coverage, y, marker=m, s=14, facecolor="white", edgecolor="#D55E00",
+                      lw=0.9, zorder=2)
+            a.scatter(r.prox_coverage, y, marker=m, s=14, color="#009E73", zorder=3)
+    a.axvline(0.95, color="#4D4D4D", linestyle=(0, (1, 2)), linewidth=1.0)
+    a.axhspan(2.5, 5.5, color="0.94", zorder=0)
+    a.set_yticks(range(len(order)))
+    a.set_yticklabels([lab[p] for p in order])
+    a.invert_yaxis()
+    a.set_xlim(-0.03, 1.03)
+    a.set_xlabel("Coverage of 95% interval for $V(\pi)$")
+    a.text(0.02, 4.0, "reads $Z$, $W$", fontsize=6.5, color="0.35", rotation=90, va="center")
+    grp = ["young", "middle", "old"]
+    pst = {"knowledge": ("#000000", "-", "Knowledge-driven rule"),
+           "cdss_top50": ("#0072B2", "--", "Risk rule, top 50%")}
+    for p, (c, ls, _) in pst.items():
+        for dm, m in mk.items():
+            g = s[(s.kind == "policy") & (s.item == p) & (s.domain == dm)].set_index("age_group")
+            b.plot(range(3), [g.loc[k, "benefit_recall"] for k in grp], color=c, ls=ls,
+                   marker=m, ms=3.5, lw=1.0)
+    b.set_xticks(range(3))
+    b.set_xticklabels(["Youngest third", "Middle third", "Oldest third"])
+    b.set_ylabel("Benefit recall (treated | ARR > 0.15)")
+    b.set_ylim(0, 1.02)
+    a.text(0.0, 1.04, "(a)", transform=a.transAxes, fontweight="bold")
+    b.text(0.0, 1.04, "(b)", transform=b.transAxes, fontweight="bold")
+    from matplotlib.lines import Line2D
+    h = [Line2D([], [], color="#D55E00", marker="o", mfc="white", ls="", label="Standard DR"),
+         Line2D([], [], color="#009E73", marker="o", ls="", label="Proximal DR")]
+    h += [Line2D([], [], color=c, ls=ls, lw=1.2, label=l) for c, ls, l in pst.values()]
+    h += [Line2D([], [], color="0.3", ls="", marker=m, ms=4, label=NICE_DOMAIN[k])
+          for k, m in mk.items()]
+    fig.legend(handles=h, loc="lower center", ncol=4, frameon=False, fontsize=6.5,
+               bbox_to_anchor=(0.5, -0.16))
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_proximal_ope.pdf", bbox_inches="tight")
+    fig.savefig(OUT / "fig_proximal_ope.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print("wrote figures/fig_proximal_ope.pdf")
+
+
 if __name__ == "__main__":
     fig_bias()
     fig_overlap()
@@ -274,3 +333,4 @@ if __name__ == "__main__":
     fig_sweeps()
     fig_weak()
     fig_sample_size()
+    fig_proximal_ope()
