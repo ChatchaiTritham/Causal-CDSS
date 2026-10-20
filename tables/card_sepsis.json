@@ -1,0 +1,29 @@
+{
+ "domain": "sepsis",
+ "summary": "Causal audit: proximal (doubly robust)",
+ "indicator": "info",
+ "detail": {
+  "first_stage_F": 2352.8,
+  "ate_proximal_dr": [
+   -0.177,
+   -0.21,
+   -0.144
+  ],
+  "ate_proxy_adjusted": [
+   -0.112,
+   -0.133,
+   -0.091
+  ],
+  "gamma_star": 0.291,
+  "delta_star": 0.226,
+  "policy": "knowledge-driven rule",
+  "policy_value_dr": 0.316,
+  "policy_ess_fraction": 0.491,
+  "policy_agreement": 0.616,
+  "policy_value_status": "unverified: confounder not recorded"
+ },
+ "source": {
+  "label": "Causal-CDSS audit protocol (Algorithm 1)",
+  "url": "https://github.com/ChatchaiTritham/Causal-CDSS"
+ }
+}

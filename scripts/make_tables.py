@@ -205,6 +205,33 @@ def tab_bootstrap() -> None:
         f"{f(r.cov_boot_pct, 2)} \\\\" for r in d.itertuples()))
 
 
+def tab_sample_size() -> None:
+    d = pd.read_csv(RES / "sample_size.csv")
+    name = {"backdoor_proxy": "Backdoor, age $+$ $Z$, $W$", "proximal": "Proximal 2SLS",
+            "proximal_dr": "Proximal DR"}
+    lines = []
+    for dm in DOM:
+        for e in name:
+            g = d[(d.domain == dm) & (d.estimator == e)].sort_values("n")
+            lines.append(f"{DOM[dm]} & {name[e]} & " + " & ".join(
+                f"{f(r.rmse, 3)} / {f(r.ci95_coverage, 2)}" for r in g.itertuples()) + " \\\\")
+    write("tab_sample_size.tex", "\n".join(lines))
+
+
+def tab_audit_card() -> None:
+    import json
+    cards = json.loads((RES / "audit_card.json").read_text(encoding="utf-8"))
+    rows = []
+    for c in cards:
+        t = c["detail"]
+        ci = lambda v: f"${v[0]:+.3f}$ [${v[1]:+.3f}$, ${v[2]:+.3f}$]"
+        rows.append(f"{DOM[c['domain']]} & {t['first_stage_F']:.0f} & {ci(t['ate_proximal_dr'])} & "
+                    f"{ci(t['ate_proxy_adjusted'])} & {t['gamma_star']:.2f} / {t['delta_star']:.2f} & "
+                    f"{t['policy_value_dr']:.3f} & {t['policy_ess_fraction']:.2f} \\\\")
+    write("tab_audit_card.tex", "\n".join(rows))
+    write("card_sepsis.json", json.dumps(cards[0], indent=1))
+
+
 if __name__ == "__main__":
     tab_proximal()
     tab_ope()
@@ -221,3 +248,7 @@ if __name__ == "__main__":
         tab_dag()
     if (RES / "proximal_bootstrap_summary.csv").exists():
         tab_bootstrap()
+    if (RES / "sample_size.csv").exists():
+        tab_sample_size()
+    if (RES / "audit_card.json").exists():
+        tab_audit_card()

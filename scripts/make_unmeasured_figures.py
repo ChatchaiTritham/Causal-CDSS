@@ -227,9 +227,50 @@ def fig_weak() -> None:
     print("wrote figures/fig_weak_proxies.pdf")
 
 
+def fig_sample_size() -> None:
+    """RMSE and interval coverage against cohort size (results/sample_size.csv)."""
+    path = RES / "sample_size.csv"
+    if not path.exists():
+        return
+    d = pd.read_csv(path)
+    est = {"backdoor_proxy": ("#56B4E9", "-", "Backdoor on age, $Z$, $W$"),
+           "proximal": ("#009E73", "--", "Proximal 2SLS"),
+           "proximal_dr": ("#000000", "-", "Proximal DR")}
+    mk = {"sepsis": "o", "ards": "s", "cardiac": "^"}
+    fig, (a, b) = plt.subplots(1, 2, figsize=(5.8, 2.7))
+    for e, (c, ls, _) in est.items():
+        for dm, m in mk.items():
+            g = d[(d.estimator == e) & (d.domain == dm)].sort_values("n")
+            a.plot(g.n, g.rmse, color=c, ls=ls, marker=m, ms=3.5, lw=1.0)
+            b.plot(g.n, g.ci95_coverage, color=c, ls=ls, marker=m, ms=3.5, lw=1.0)
+    for ax in (a, b):
+        ax.set_xscale("log")
+        ax.set_xticks(sorted(d.n.unique()))
+        ax.set_xticklabels([f"{v:,}" for v in sorted(d.n.unique())])
+        ax.set_xlabel("Cohort size $n$")
+    a.set_yscale("log")
+    a.set_ylabel("RMSE of the ATE (mortality)")
+    b.axhline(0.95, color="#4D4D4D", linestyle=(0, (1, 2)), linewidth=1.0)
+    b.set_ylabel("Coverage of 95% interval")
+    b.set_ylim(-0.03, 1.05)
+    a.text(0.0, 1.04, "(a)", transform=a.transAxes, fontweight="bold")
+    b.text(0.0, 1.04, "(b)", transform=b.transAxes, fontweight="bold")
+    from matplotlib.lines import Line2D
+    h = [Line2D([], [], color=c, ls=ls, lw=1.2, label=lab) for c, ls, lab in est.values()]
+    h += [Line2D([], [], color="0.3", ls="", marker=m, ms=4, label=NICE_DOMAIN[k]) for k, m in mk.items()]
+    fig.legend(handles=h, loc="lower center", ncol=6, frameon=False, fontsize=6.5,
+               handlelength=2.2, columnspacing=1.0, bbox_to_anchor=(0.5, -0.12))
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_sample_size.pdf", bbox_inches="tight")
+    fig.savefig(OUT / "fig_sample_size.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    print("wrote figures/fig_sample_size.pdf")
+
+
 if __name__ == "__main__":
     fig_bias()
     fig_overlap()
     fig_dag()
     fig_sweeps()
     fig_weak()
+    fig_sample_size()

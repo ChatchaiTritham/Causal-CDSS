@@ -1,0 +1,89 @@
+[
+  {
+    "domain": "sepsis",
+    "summary": "Causal audit: proximal (doubly robust)",
+    "indicator": "info",
+    "detail": {
+      "first_stage_F": 2352.8,
+      "ate_proximal_dr": [
+        -0.177,
+        -0.21,
+        -0.144
+      ],
+      "ate_proxy_adjusted": [
+        -0.112,
+        -0.133,
+        -0.091
+      ],
+      "gamma_star": 0.291,
+      "delta_star": 0.226,
+      "policy": "knowledge-driven rule",
+      "policy_value_dr": 0.316,
+      "policy_ess_fraction": 0.491,
+      "policy_agreement": 0.616,
+      "policy_value_status": "unverified: confounder not recorded"
+    },
+    "source": {
+      "label": "Causal-CDSS audit protocol (Algorithm 1)",
+      "url": "https://github.com/ChatchaiTritham/Causal-CDSS"
+    }
+  },
+  {
+    "domain": "ards",
+    "summary": "Causal audit: proximal (doubly robust)",
+    "indicator": "info",
+    "detail": {
+      "first_stage_F": 1853.3,
+      "ate_proximal_dr": [
+        -0.114,
+        -0.139,
+        -0.09
+      ],
+      "ate_proxy_adjusted": [
+        -0.072,
+        -0.093,
+        -0.051
+      ],
+      "gamma_star": 0.281,
+      "delta_star": 0.232,
+      "policy": "knowledge-driven rule",
+      "policy_value_dr": 0.379,
+      "policy_ess_fraction": 0.506,
+      "policy_agreement": 0.575,
+      "policy_value_status": "unverified: confounder not recorded"
+    },
+    "source": {
+      "label": "Causal-CDSS audit protocol (Algorithm 1)",
+      "url": "https://github.com/ChatchaiTritham/Causal-CDSS"
+    }
+  },
+  {
+    "domain": "cardiac",
+    "summary": "Causal audit: proximal (doubly robust)",
+    "indicator": "info",
+    "detail": {
+      "first_stage_F": 2729.8,
+      "ate_proximal_dr": [
+        -0.175,
+        -0.207,
+        -0.143
+      ],
+      "ate_proxy_adjusted": [
+        -0.135,
+        -0.157,
+        -0.114
+      ],
+      "gamma_star": 0.283,
+      "delta_star": 0.253,
+      "policy": "knowledge-driven rule",
+      "policy_value_dr": 0.29,
+      "policy_ess_fraction": 0.443,
+      "policy_agreement": 0.623,
+      "policy_value_status": "unverified: confounder not recorded"
+    },
+    "source": {
+      "label": "Causal-CDSS audit protocol (Algorithm 1)",
+      "url": "https://github.com/ChatchaiTritham/Causal-CDSS"
+    }
+  }
+]
