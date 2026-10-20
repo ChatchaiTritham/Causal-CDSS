@@ -41,16 +41,3 @@ def test_dr_consistent_when_outcome_bridge_correct_and_q_wrong():
     d = px.simulate_ms(cfg, 100_000, np.random.default_rng(3), h_ok=True, q_ok=False, tau=-0.16)
     est = px.pipw_sandwich(d)[0]
     assert abs(est + 0.16) < 0.02
-
-
-def test_audit_card_has_cds_hooks_required_fields():
-    path = os.path.join(os.path.dirname(HERE), "results", "audit_card.json")
-    cards = json.load(open(path, encoding="utf-8"))
-    for c in cards:
-        card = c["card"]
-        for k in ("uuid", "summary", "indicator", "source"):
-            assert k in card
-        assert isinstance(card["detail"], str)
-        assert len(card["summary"]) <= 140
-        assert card["indicator"] in ("info", "warning", "critical")
-        assert "label" in card["source"] and "topic" in card["source"]

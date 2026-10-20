@@ -4,6 +4,8 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue) ![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![Reproducible](https://img.shields.io/badge/reproducible-seed--42-success)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23504147.svg)](https://doi.org/10.5281/zenodo.23504147) (concept DOI, always the latest release; the version DOI of each release is listed in CHANGELOG.md)
+
 ## Overview
 
 Clinical decision support is usually graded the way a forecaster is graded: AUROC, accuracy, calibration. Those scores reward a model for matching what was observed, but a system that *recommends* a treatment is making an interventional claim, and an interventional claim cannot be checked by a correlational yardstick. When sicker patients are the ones who get treated, the raw treated-minus-untreated comparison can even point the wrong way.

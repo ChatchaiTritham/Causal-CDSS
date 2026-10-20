@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CDS Hooks 2.0 service response (cards only), transcribed from https://cds-hooks.hl7.org/2.0/#cds-service-response",
+  "type": "object",
+  "required": ["cards"],
+  "properties": {
+    "cards": {"type": "array", "items": {"$ref": "#/$defs/card"}},
+    "systemActions": {"type": "array"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "coding": {
+      "type": "object", "required": ["code"],
+      "properties": {"system": {"type": "string"}, "code": {"type": "string"}, "display": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "card": {
+      "type": "object",
+      "required": ["summary", "indicator", "source"],
+      "properties": {
+        "uuid": {"type": "string"},
+        "summary": {"type": "string", "maxLength": 140},
+        "detail": {"type": "string"},
+        "indicator": {"enum": ["info", "warning", "critical"]},
+        "source": {
+          "type": "object", "required": ["label"],
+          "properties": {"label": {"type": "string"}, "url": {"type": "string", "format": "uri"},
+                         "icon": {"type": "string"}, "topic": {"$ref": "#/$defs/coding"}},
+          "additionalProperties": false
+        },
+        "suggestions": {"type": "array"},
+        "selectionBehavior": {"enum": ["at-most-one", "any"]},
+        "overrideReasons": {"type": "array", "items": {"$ref": "#/$defs/coding"}},
+        "links": {"type": "array"},
+        "extension": {"type": "object"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

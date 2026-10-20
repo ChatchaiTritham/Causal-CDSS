@@ -1,0 +1,4 @@
+domain,doubleml_irm,own_aipw_same_folds,doubleml_se,own_aipw_se,linearmodels_iv2sls,own_proximal_2sls,linearmodels_se,own_2sls_se,versions
+ards,-0.0767,-0.0767,0.0104,0.0104,-0.1315,-0.1315,0.0125,0.0125,doubleml 0.11.4; linearmodels 7.1
+cardiac,-0.1267,-0.1267,0.01,0.01,-0.2037,-0.2037,0.0134,0.0134,doubleml 0.11.4; linearmodels 7.1
+sepsis,-0.1144,-0.1144,0.0103,0.0103,-0.1919,-0.1919,0.0133,0.0133,doubleml 0.11.4; linearmodels 7.1

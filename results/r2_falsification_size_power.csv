@@ -1,0 +1,40 @@
+domain,implication,holds_under_truth,quantity,fisher_z_reject_005,fisher_z_reject_bonf,gcm_reject_005,gcm_reject_bonf,reps
+ards,z _||_ a | severity,True,size,0.04,0.005,0.06,0.005,200
+ards,"z _||_ y | severity,a,age",True,size,0.06,0.005,0.07,0.01,200
+ards,w _||_ a | severity,True,size,0.05,0.0,0.06,0.005,200
+ards,"w _||_ y | severity,a,age",True,size,0.06,0.0,0.085,0.01,200
+ards,z _||_ w | severity,True,size,0.075,0.0,0.095,0.015,200
+ards,z _||_ age | severity,True,size,0.035,0.0,0.045,0.0,200
+ards,w _||_ age | severity,True,size,0.04,0.005,0.04,0.0,200
+ards,age _||_ a | severity,True,size,0.055,0.0,0.06,0.005,200
+ards,"severity _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+ards,"z _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+ards,"w _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+ards,true graph passes all 8 (fisher_z),True,1 - familywise error,,0.985,,,200
+ards,true graph passes all 8 (gcm),True,1 - familywise error,,,,0.945,200
+cardiac,z _||_ a | severity,True,size,0.08,0.005,0.09,0.01,200
+cardiac,"z _||_ y | severity,a,age",True,size,0.025,0.01,0.06,0.01,200
+cardiac,w _||_ a | severity,True,size,0.04,0.0,0.075,0.0,200
+cardiac,"w _||_ y | severity,a,age",True,size,0.06,0.005,0.085,0.015,200
+cardiac,z _||_ w | severity,True,size,0.05,0.005,0.075,0.005,200
+cardiac,z _||_ age | severity,True,size,0.02,0.0,0.05,0.005,200
+cardiac,w _||_ age | severity,True,size,0.06,0.005,0.07,0.015,200
+cardiac,age _||_ a | severity,True,size,0.085,0.005,0.07,0.01,200
+cardiac,"severity _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+cardiac,"z _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+cardiac,"w _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+cardiac,true graph passes all 8 (fisher_z),True,1 - familywise error,,0.955,,,200
+cardiac,true graph passes all 8 (gcm),True,1 - familywise error,,,,0.925,200
+sepsis,z _||_ a | severity,True,size,0.04,0.01,0.05,0.0,200
+sepsis,"z _||_ y | severity,a,age",True,size,0.04,0.01,0.085,0.015,200
+sepsis,w _||_ a | severity,True,size,0.05,0.005,0.065,0.005,200
+sepsis,"w _||_ y | severity,a,age",True,size,0.045,0.0,0.075,0.015,200
+sepsis,z _||_ w | severity,True,size,0.04,0.0,0.06,0.0,200
+sepsis,z _||_ age | severity,True,size,0.06,0.0,0.065,0.01,200
+sepsis,w _||_ age | severity,True,size,0.035,0.0,0.06,0.0,200
+sepsis,age _||_ a | severity,True,size,0.045,0.0,0.065,0.015,200
+sepsis,"severity _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+sepsis,"z _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+sepsis,"w _||_ y | a,age",False,power,1.0,1.0,1.0,1.0,200
+sepsis,true graph passes all 8 (fisher_z),True,1 - familywise error,,0.975,,,200
+sepsis,true graph passes all 8 (gcm),True,1 - familywise error,,,,0.935,200

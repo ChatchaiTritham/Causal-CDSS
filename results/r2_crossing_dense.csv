@@ -1,0 +1,25 @@
+domain,restriction,estimator,comparator,crossing,ci_lo,ci_hi,comparator_bias_at_0_10,reps,grid
+sepsis,gamma,2sls,linear proxy adjustment,0.242,0.216,0.249,0.0523,200,0.10-0.30 step 0.02
+sepsis,gamma,2sls,cross-fitted AIPW (logistic),0.249,0.236,0.261,0.0551,200,0.10-0.30 step 0.02
+sepsis,gamma,dr,linear proxy adjustment,>0.30,,,0.0523,200,0.10-0.30 step 0.02
+sepsis,gamma,dr,cross-fitted AIPW (logistic),>0.30,,,0.0551,200,0.10-0.30 step 0.02
+sepsis,delta,2sls,linear proxy adjustment,0.191,0.177,0.205,0.0484,200,0.10-0.30 step 0.02
+sepsis,delta,2sls,cross-fitted AIPW (logistic),0.217,0.196,0.227,0.0523,200,0.10-0.30 step 0.02
+sepsis,delta,dr,linear proxy adjustment,0.234,0.22,0.25,0.0484,200,0.10-0.30 step 0.02
+sepsis,delta,dr,cross-fitted AIPW (logistic),0.255,0.234,0.286,0.0523,200,0.10-0.30 step 0.02
+ards,gamma,2sls,linear proxy adjustment,0.249,0.238,0.26,0.0483,200,0.10-0.30 step 0.02
+ards,gamma,2sls,cross-fitted AIPW (logistic),0.25,0.239,0.261,0.0491,200,0.10-0.30 step 0.02
+ards,gamma,dr,linear proxy adjustment,>0.30,,,0.0483,200,0.10-0.30 step 0.02
+ards,gamma,dr,cross-fitted AIPW (logistic),>0.30,,,0.0491,200,0.10-0.30 step 0.02
+ards,delta,2sls,linear proxy adjustment,0.202,0.182,0.209,0.0442,200,0.10-0.30 step 0.02
+ards,delta,2sls,cross-fitted AIPW (logistic),0.206,0.197,0.213,0.0453,200,0.10-0.30 step 0.02
+ards,delta,dr,linear proxy adjustment,0.215,0.209,0.226,0.0442,200,0.10-0.30 step 0.02
+ards,delta,dr,cross-fitted AIPW (logistic),0.218,0.212,0.24,0.0453,200,0.10-0.30 step 0.02
+cardiac,gamma,2sls,linear proxy adjustment,0.196,0.19,0.214,0.0502,200,0.10-0.30 step 0.02
+cardiac,gamma,2sls,cross-fitted AIPW (logistic),0.229,0.2,0.244,0.0553,200,0.10-0.30 step 0.02
+cardiac,gamma,dr,linear proxy adjustment,>0.30,,,0.0502,200,0.10-0.30 step 0.02
+cardiac,gamma,dr,cross-fitted AIPW (logistic),>0.30,,,0.0553,200,0.10-0.30 step 0.02
+cardiac,delta,2sls,linear proxy adjustment,0.166,0.156,0.171,0.0458,200,0.10-0.30 step 0.02
+cardiac,delta,2sls,cross-fitted AIPW (logistic),0.188,0.177,0.201,0.0526,200,0.10-0.30 step 0.02
+cardiac,delta,dr,linear proxy adjustment,0.242,0.198,0.251,0.0458,200,0.10-0.30 step 0.02
+cardiac,delta,dr,cross-fitted AIPW (logistic),0.277,0.252,0.297,0.0526,200,0.10-0.30 step 0.02

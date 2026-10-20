@@ -1,161 +1,167 @@
-[
-  {
-    "hook": "order-select",
-    "card": {
-      "uuid": "a4d988fe-9078-56e4-bc0e-e7719daac9cd",
-      "summary": "Causal audit (sepsis): proximal (DR form)",
-      "detail": "**Strategy:** proximal (DR form).  \nFirst-stage F = 2353 (threshold 16).  \nATE, proximal DR: -0.177 [-0.210, -0.144]; proxy-adjusted: -0.112 [-0.133, -0.091].  \nDesign-stage crossing points for this graph: gamma* = 0.29, delta* = 0.23 (not estimated from these records).  \nKnowledge-driven rule value (standard DR) 0.316: unverified, confounder not recorded.",
-      "indicator": "info",
-      "source": {
-        "label": "Causal-CDSS audit protocol (Algorithm 1)",
-        "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
-        "topic": {
-          "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
-          "code": "causal-audit",
-          "display": "Causal audit verdict"
+{
+  "sepsis": {
+    "cards": [
+      {
+        "uuid": "a4d988fe-9078-56e4-bc0e-e7719daac9cd",
+        "summary": "Causal audit (sepsis): SAFETY VETO, rule withholds indicated therapy",
+        "detail": "**Strategy:** proximal (DR form), if elicited violations are below half the reference crossing.  \nFirst-stage F = 2353 (design-specific threshold 16; use weak-identification-robust intervals below F = 104.7).  \nATE, proximal DR: -0.177 [-0.210, -0.144]; proxy-adjusted: -0.112 [-0.133, -0.091].  \nReference crossing points (design stage, DR): gamma* = 0.29, delta* = 0.23.  \nRule withholds treatment from 14% of indication-flagged patients (tolerance 10%).  \nKnowledge-driven rule value (standard DR) 0.316: unverified, confounder not recorded.",
+        "indicator": "critical",
+        "source": {
+          "label": "Causal-CDSS audit protocol (Algorithm 1)",
+          "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
+          "topic": {
+            "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
+            "code": "causal-audit",
+            "display": "Causal audit verdict"
+          }
+        },
+        "extension": {
+          "org.causal-cdss.audit": {
+            "domain": "sepsis",
+            "intended_population": "synthetic audit cohort; method comparison only",
+            "first_stage_F": 2352.8,
+            "treatment_bridge_converged": true,
+            "ate_proximal_dr": [
+              -0.177,
+              -0.21,
+              -0.144
+            ],
+            "ate_proxy_adjusted": [
+              -0.112,
+              -0.133,
+              -0.091
+            ],
+            "gamma_star_reference": 0.291,
+            "delta_star_reference": 0.226,
+            "crossing_source": "design-stage DR crossing of this paper's generator (results/proximal_crossing.csv); not computed from the audited records",
+            "policy": "knowledge-driven rule",
+            "policy_value_dr": 0.316,
+            "policy_ess_fraction": 0.491,
+            "policy_agreement": 0.616,
+            "policy_value_status": "unverified: confounder not recorded",
+            "withhold_share_indicated": 0.142,
+            "safety_veto": true,
+            "subgroup_table": "results/subgroup_audit.csv",
+            "reaudit_triggers": [
+              "declared DAG or proxy definition changed",
+              "first-stage F below 16",
+              "treatment-assignment practice or guideline changed",
+              "proxy loading or age case-mix shift at the deployment site (see results/r2_site_shift.csv)"
+            ],
+            "fhir_bundle": "results/fhir_bundle_sepsis.json"
+          }
         }
       }
-    },
-    "audit": {
-      "domain": "sepsis",
-      "intended_population": "synthetic audit cohort; method comparison only",
-      "first_stage_F": 2352.8,
-      "ate_proximal_dr": [
-        -0.177,
-        -0.21,
-        -0.144
-      ],
-      "ate_proxy_adjusted": [
-        -0.112,
-        -0.133,
-        -0.091
-      ],
-      "gamma_star_design_stage": 0.291,
-      "delta_star_design_stage": 0.226,
-      "policy": "knowledge-driven rule",
-      "policy_value_dr": 0.316,
-      "policy_ess_fraction": 0.491,
-      "policy_agreement": 0.616,
-      "policy_value_status": "unverified: confounder not recorded",
-      "subgroup_table": "results/subgroup_audit.csv",
-      "reaudit_triggers": [
-        "declared DAG or proxy definition changed",
-        "first-stage F below 16",
-        "treatment-assignment practice or guideline changed",
-        "case-mix shift between audit and deployment site"
-      ],
-      "fhir_mapping": {
-        "declared_model": "Library (attached graph)",
-        "proxies": "Observation",
-        "verdict": "GuidanceResponse",
-        "estimate": "Evidence"
-      }
-    }
+    ]
   },
-  {
-    "hook": "order-select",
-    "card": {
-      "uuid": "eaf3f3da-b3ec-5976-9ab7-ea330d6e09b8",
-      "summary": "Causal audit (ards): proximal (DR form)",
-      "detail": "**Strategy:** proximal (DR form).  \nFirst-stage F = 1853 (threshold 16).  \nATE, proximal DR: -0.114 [-0.139, -0.090]; proxy-adjusted: -0.072 [-0.093, -0.051].  \nDesign-stage crossing points for this graph: gamma* = 0.28, delta* = 0.23 (not estimated from these records).  \nKnowledge-driven rule value (standard DR) 0.379: unverified, confounder not recorded.",
-      "indicator": "info",
-      "source": {
-        "label": "Causal-CDSS audit protocol (Algorithm 1)",
-        "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
-        "topic": {
-          "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
-          "code": "causal-audit",
-          "display": "Causal audit verdict"
+  "ards": {
+    "cards": [
+      {
+        "uuid": "eaf3f3da-b3ec-5976-9ab7-ea330d6e09b8",
+        "summary": "Causal audit (ards): SAFETY VETO, rule withholds indicated therapy",
+        "detail": "**Strategy:** proximal (DR form), if elicited violations are below half the reference crossing.  \nFirst-stage F = 1853 (design-specific threshold 16; use weak-identification-robust intervals below F = 104.7).  \nATE, proximal DR: -0.114 [-0.139, -0.090]; proxy-adjusted: -0.072 [-0.093, -0.051].  \nReference crossing points (design stage, DR): gamma* = 0.28, delta* = 0.23.  \nRule withholds treatment from 49% of indication-flagged patients (tolerance 10%).  \nKnowledge-driven rule value (standard DR) 0.379: unverified, confounder not recorded.",
+        "indicator": "critical",
+        "source": {
+          "label": "Causal-CDSS audit protocol (Algorithm 1)",
+          "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
+          "topic": {
+            "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
+            "code": "causal-audit",
+            "display": "Causal audit verdict"
+          }
+        },
+        "extension": {
+          "org.causal-cdss.audit": {
+            "domain": "ards",
+            "intended_population": "synthetic audit cohort; method comparison only",
+            "first_stage_F": 1853.3,
+            "treatment_bridge_converged": true,
+            "ate_proximal_dr": [
+              -0.114,
+              -0.139,
+              -0.09
+            ],
+            "ate_proxy_adjusted": [
+              -0.072,
+              -0.093,
+              -0.051
+            ],
+            "gamma_star_reference": 0.281,
+            "delta_star_reference": 0.232,
+            "crossing_source": "design-stage DR crossing of this paper's generator (results/proximal_crossing.csv); not computed from the audited records",
+            "policy": "knowledge-driven rule",
+            "policy_value_dr": 0.379,
+            "policy_ess_fraction": 0.506,
+            "policy_agreement": 0.575,
+            "policy_value_status": "unverified: confounder not recorded",
+            "withhold_share_indicated": 0.486,
+            "safety_veto": true,
+            "subgroup_table": "results/subgroup_audit.csv",
+            "reaudit_triggers": [
+              "declared DAG or proxy definition changed",
+              "first-stage F below 16",
+              "treatment-assignment practice or guideline changed",
+              "proxy loading or age case-mix shift at the deployment site (see results/r2_site_shift.csv)"
+            ],
+            "fhir_bundle": "results/fhir_bundle_ards.json"
+          }
         }
       }
-    },
-    "audit": {
-      "domain": "ards",
-      "intended_population": "synthetic audit cohort; method comparison only",
-      "first_stage_F": 1853.3,
-      "ate_proximal_dr": [
-        -0.114,
-        -0.139,
-        -0.09
-      ],
-      "ate_proxy_adjusted": [
-        -0.072,
-        -0.093,
-        -0.051
-      ],
-      "gamma_star_design_stage": 0.281,
-      "delta_star_design_stage": 0.232,
-      "policy": "knowledge-driven rule",
-      "policy_value_dr": 0.379,
-      "policy_ess_fraction": 0.506,
-      "policy_agreement": 0.575,
-      "policy_value_status": "unverified: confounder not recorded",
-      "subgroup_table": "results/subgroup_audit.csv",
-      "reaudit_triggers": [
-        "declared DAG or proxy definition changed",
-        "first-stage F below 16",
-        "treatment-assignment practice or guideline changed",
-        "case-mix shift between audit and deployment site"
-      ],
-      "fhir_mapping": {
-        "declared_model": "Library (attached graph)",
-        "proxies": "Observation",
-        "verdict": "GuidanceResponse",
-        "estimate": "Evidence"
-      }
-    }
+    ]
   },
-  {
-    "hook": "order-select",
-    "card": {
-      "uuid": "4f38d625-15e6-512b-8d53-6ab675526eb6",
-      "summary": "Causal audit (cardiac): proximal (DR form)",
-      "detail": "**Strategy:** proximal (DR form).  \nFirst-stage F = 2730 (threshold 16).  \nATE, proximal DR: -0.175 [-0.207, -0.143]; proxy-adjusted: -0.135 [-0.157, -0.114].  \nDesign-stage crossing points for this graph: gamma* = 0.28, delta* = 0.25 (not estimated from these records).  \nKnowledge-driven rule value (standard DR) 0.290: unverified, confounder not recorded.",
-      "indicator": "info",
-      "source": {
-        "label": "Causal-CDSS audit protocol (Algorithm 1)",
-        "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
-        "topic": {
-          "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
-          "code": "causal-audit",
-          "display": "Causal audit verdict"
+  "cardiac": {
+    "cards": [
+      {
+        "uuid": "4f38d625-15e6-512b-8d53-6ab675526eb6",
+        "summary": "Causal audit (cardiac): SAFETY VETO, rule withholds indicated therapy",
+        "detail": "**Strategy:** proximal (DR form), if elicited violations are below half the reference crossing.  \nFirst-stage F = 2730 (design-specific threshold 16; use weak-identification-robust intervals below F = 104.7).  \nATE, proximal DR: -0.175 [-0.207, -0.143]; proxy-adjusted: -0.135 [-0.157, -0.114].  \nReference crossing points (design stage, DR): gamma* = 0.28, delta* = 0.25.  \nRule withholds treatment from 11% of indication-flagged patients (tolerance 10%).  \nKnowledge-driven rule value (standard DR) 0.290: unverified, confounder not recorded.",
+        "indicator": "critical",
+        "source": {
+          "label": "Causal-CDSS audit protocol (Algorithm 1)",
+          "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
+          "topic": {
+            "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
+            "code": "causal-audit",
+            "display": "Causal audit verdict"
+          }
+        },
+        "extension": {
+          "org.causal-cdss.audit": {
+            "domain": "cardiac",
+            "intended_population": "synthetic audit cohort; method comparison only",
+            "first_stage_F": 2729.8,
+            "treatment_bridge_converged": true,
+            "ate_proximal_dr": [
+              -0.175,
+              -0.207,
+              -0.143
+            ],
+            "ate_proxy_adjusted": [
+              -0.135,
+              -0.157,
+              -0.114
+            ],
+            "gamma_star_reference": 0.283,
+            "delta_star_reference": 0.253,
+            "crossing_source": "design-stage DR crossing of this paper's generator (results/proximal_crossing.csv); not computed from the audited records",
+            "policy": "knowledge-driven rule",
+            "policy_value_dr": 0.29,
+            "policy_ess_fraction": 0.443,
+            "policy_agreement": 0.623,
+            "policy_value_status": "unverified: confounder not recorded",
+            "withhold_share_indicated": 0.111,
+            "safety_veto": true,
+            "subgroup_table": "results/subgroup_audit.csv",
+            "reaudit_triggers": [
+              "declared DAG or proxy definition changed",
+              "first-stage F below 16",
+              "treatment-assignment practice or guideline changed",
+              "proxy loading or age case-mix shift at the deployment site (see results/r2_site_shift.csv)"
+            ],
+            "fhir_bundle": "results/fhir_bundle_cardiac.json"
+          }
         }
       }
-    },
-    "audit": {
-      "domain": "cardiac",
-      "intended_population": "synthetic audit cohort; method comparison only",
-      "first_stage_F": 2729.8,
-      "ate_proximal_dr": [
-        -0.175,
-        -0.207,
-        -0.143
-      ],
-      "ate_proxy_adjusted": [
-        -0.135,
-        -0.157,
-        -0.114
-      ],
-      "gamma_star_design_stage": 0.283,
-      "delta_star_design_stage": 0.253,
-      "policy": "knowledge-driven rule",
-      "policy_value_dr": 0.29,
-      "policy_ess_fraction": 0.443,
-      "policy_agreement": 0.623,
-      "policy_value_status": "unverified: confounder not recorded",
-      "subgroup_table": "results/subgroup_audit.csv",
-      "reaudit_triggers": [
-        "declared DAG or proxy definition changed",
-        "first-stage F below 16",
-        "treatment-assignment practice or guideline changed",
-        "case-mix shift between audit and deployment site"
-      ],
-      "fhir_mapping": {
-        "declared_model": "Library (attached graph)",
-        "proxies": "Observation",
-        "verdict": "GuidanceResponse",
-        "estimate": "Evidence"
-      }
-    }
+    ]
   }
-]
+}

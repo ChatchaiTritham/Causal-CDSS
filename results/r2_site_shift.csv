@@ -1,0 +1,22 @@
+domain,shift,true_ate_site_B,ate_bias,ate_coverage,value_treat_all_bias,value_kd_rule_bias,reps
+ards,age mean +0.5,-0.1234,0.0063,0.91,-0.0032,0.0039,200
+ards,age mean +1.0,-0.1245,0.0074,0.9,-0.0039,0.0023,200
+ards,proxy loadings x0.8,-0.1177,0.0006,0.955,-0.007,0.004,200
+ards,proxy loadings x0.9,-0.1177,0.0006,0.955,-0.007,0.0042,200
+ards,proxy loadings x1.1,-0.1177,0.0006,0.955,-0.0069,0.0046,200
+ards,proxy loadings x1.2,-0.1177,0.0006,0.955,-0.0069,0.0046,200
+ards,none,-0.1177,0.0006,0.955,-0.007,0.0045,200
+cardiac,age mean +0.5,-0.2039,0.0114,0.95,-0.0132,0.0165,200
+cardiac,age mean +1.0,-0.2071,0.0146,0.925,-0.0109,0.0166,200
+cardiac,proxy loadings x0.8,-0.1875,-0.005,0.96,-0.0268,0.0107,200
+cardiac,proxy loadings x0.9,-0.1875,-0.005,0.96,-0.0268,0.0127,200
+cardiac,proxy loadings x1.1,-0.1875,-0.005,0.96,-0.0268,0.016,200
+cardiac,proxy loadings x1.2,-0.1875,-0.005,0.96,-0.0268,0.0173,200
+cardiac,none,-0.1875,-0.005,0.96,-0.0268,0.0145,200
+sepsis,age mean +0.5,-0.1727,0.0092,0.955,-0.0077,0.0126,200
+sepsis,age mean +1.0,-0.1754,0.0118,0.92,-0.0066,0.012,200
+sepsis,proxy loadings x0.8,-0.1614,-0.0021,0.95,-0.0163,0.0098,200
+sepsis,proxy loadings x0.9,-0.1614,-0.0021,0.95,-0.0163,0.011,200
+sepsis,proxy loadings x1.1,-0.1614,-0.0021,0.95,-0.0162,0.0131,200
+sepsis,proxy loadings x1.2,-0.1614,-0.0021,0.95,-0.0162,0.0139,200
+sepsis,none,-0.1614,-0.0021,0.95,-0.0162,0.0122,200

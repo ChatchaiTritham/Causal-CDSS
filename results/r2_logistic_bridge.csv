@@ -1,0 +1,7 @@
+domain,estimator,true_ate,bias,mcse,emp_sd,rmse,coverage,nonconverged,reps
+ards,logistic outcome bridge (plug-in),-0.1177,0.0006,0.0008,0.0114,0.0114,0.095,1,200
+ards,"DR, logistic h + q",-0.1177,0.0008,0.0009,0.0132,0.0132,0.95,1,200
+cardiac,logistic outcome bridge (plug-in),-0.1875,-0.0007,0.0007,0.0104,0.0104,0.21,1,200
+cardiac,"DR, logistic h + q",-0.1875,-0.0009,0.0012,0.0174,0.0174,0.965,1,200
+sepsis,logistic outcome bridge (plug-in),-0.1614,-0.0005,0.0008,0.0111,0.0111,0.14,6,200
+sepsis,"DR, logistic h + q",-0.1614,-0.0,0.0013,0.018,0.018,0.99,6,200

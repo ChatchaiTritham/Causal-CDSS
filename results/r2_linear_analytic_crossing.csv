@@ -1,0 +1,7 @@
+domain,restriction,linear_analogue_crossing,common_scale,scale
+sepsis,gamma,0.237,0.215,gamma*/beta_U
+sepsis,delta,0.225,0.138,delta*/SD(W)
+ards,gamma,0.236,0.249,gamma*/beta_U
+ards,delta,0.195,0.13,delta*/SD(W)
+cardiac,gamma,0.245,0.196,gamma*/beta_U
+cardiac,delta,0.238,0.134,delta*/SD(W)

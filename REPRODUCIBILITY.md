@@ -1,5 +1,14 @@
 # Reproducibility
 
+## Paper traceability first (KBS manuscript, release v1.0.4)
+
+Run `python scripts/run_paper.py` to regenerate only the files the paper uses and check them
+against `results/SHA256SUMS_paper`. Legacy files are hashed separately in
+`results/SHA256SUMS_legacy`. The full manuscript-element -> script -> file table is in the
+"Traceability" section below; round-2 review analyses come from `scripts/review_round2.py`
+(results/r2_*.csv, Supplementary Sections S28-S40).
+
+
 This repository is deterministic at a fixed seed (`42`). Every number in the
 manuscript that this code is responsible for is recomputed at run time from
 structural causal models and standard estimators; nothing is hardcoded in the
@@ -39,7 +48,7 @@ Headline values produced (seed 42), as they appear in `results/`:
 (Bias = |naive - backdoor-adjusted| x 100; counterfactual sign accuracy = 1.00
 in all three domains.)
 
-### 2. Associational-vs-causal model comparison — `scripts/model_comparison.py`
+### 2. Legacy verification cohort (not used in the KBS manuscript) — `scripts/model_comparison.py`
 
 ```bash
 python scripts/model_comparison.py    # seed 42
@@ -49,13 +58,14 @@ The driver fails closed if PyTorch is unavailable. It never writes manuscript
 evidence from the labelled NumPy proxy implementation.
 
 - Cohort size: **10,000 trajectories per domain** (`N_PATIENTS = 10000`),
-  6 timesteps each — this is the "10,000 trajectories" experiment reported in the
-  manuscript abstract and Table "Associational vs. causal performance".
+  6 timesteps each. This legacy experiment belongs to an earlier version of the
+  paper; its numbers do not appear in the KBS manuscript (Supplementary Section S8
+  summarises it as an implementation check only).
 - Five architectures (LR, RF, XGBoost, LSTM, TCN). Global determinism is set via
   `PYTHONHASHSEED`, `random.seed`, `np.random.seed`, and `torch.manual_seed`.
 - Writes `results/model_comparison.csv` and `results/model_comparison.json`.
 
-Headline values produced (seed 42): mean associational accuracy 74.7%
+Legacy values (seed 42; not manuscript evidence): mean associational accuracy 74.7%
 (AUROC ~0.81), naive causal accuracy 0% for every architecture, adjusted causal
 accuracy mean 84.9% (TCN 98.4%, LSTM 96.4%, LR 94.1%, XGBoost 88.4%, RF 47.2%).
 
@@ -141,12 +151,16 @@ v1.0.3 is the first release after v1.0.1 with new code.
 | Table S16 (bootstrap) | scripts/proximal_bootstrap.py | results/proximal_bootstrap*.csv |
 | Tables S21, S23, S24 | scripts/proximal_audit_extensions.py | results/bridge_misspecification.csv, kb_misspecification.csv, estimand_checks.csv |
 | Table S22 | scripts/crossing_uncertainty.py | results/proximal_crossing_ci.csv |
+| Supplementary Sections S23-S34, Tables S29 onward | scripts/review_round2.py | results/r2_*.csv |
+| Round-2 LaTeX table bodies | scripts/make_tables_r2.py | tables/r2_*.tex |
+| Table S13, CDS Hooks response, FHIR bundles | scripts/audit_card.py | results/audit_card.json, cds_services_discovery.json, fhir_bundle_*.json |
+| Main-text Fig. 3 | scripts/make_architecture_figure.py | figures/fig_architecture.pdf |
 | All LaTeX table bodies | scripts/make_tables.py | tables/*.tex |
 
 Files from the separate verification cohort (`meta_learners*`, `model_comparison*`,
 `causal_metrics.csv`, `cate_subgroups.csv`, `confounding_sensitivity.csv`, `ate_by_domain.csv`)
 support Supplementary Sections S1-S5 and S8 only; they play no part in the audit argument.
-`results/SHA256SUMS` lists the hash of every result file in this release.
+`results/SHA256SUMS_paper` hashes the files the paper uses and `results/SHA256SUMS_legacy` the legacy files.
 
 ### Validation note (intended use)
 
@@ -154,3 +168,21 @@ Research software for method comparison on synthetic data. It is not a validated
 medical-device tool (IEC 62304 / ISO 13485 4.1.6 tool validation has not been performed).
 Credibility evidence is limited to code verification: seeded reproduction of every table and
 the unit tests in `tests/`. Environment: `requirements.txt` (pinned).
+
+## v1.0.4 (2026-10-21): second review round
+
+- `scripts/review_round2.py` -- nonlinear outcome bridge and worst-case coverage, within-arm F,
+  policy value with failed solves as inconclusive, cross-fitted standard DR at three clip levels,
+  policy-value bootstrap, trial-calibrated effects and proxy loadings, harm term with decision
+  curve, 60-generator held-out Latin hypercube and three stress arms, Fisher-z vs GCM size/power,
+  repeated cross-fitted DML with nuisance diagnostics, DoubleML OVB bounds and reference
+  cross-checks (DoubleML, linearmodels), dense-grid crossing points against an AIPW comparator,
+  Hansen J over-identification, logistic outcome bridge, site shift, differential proxy error,
+  Proposition 1 check and analytic linear crossing, per-cell non-convergence. Outputs `results/r2_*.csv`.
+- `scripts/audit_card.py` -- emits a CDS Hooks 2.0 response `{"cards": [...]}` with audit numbers in
+  `card.extension`, a discovery document, a safety veto, and an illustrative FHIR R5 Bundle per domain;
+  gamma*/delta* are labelled design-stage DR reference values. `tests/test_audit_card.py` validates
+  every response against `tests/schemas/cds_hooks_2_0_response.schema.json`.
+- `requirements-lock.txt` -- full pinned environment (pip freeze) of the run.
+- Not developed under IEC 62304:2006+A1:2015 and not validated as production software under
+  ISO 13485:2016 clause 4.1.6.

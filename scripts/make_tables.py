@@ -32,7 +32,7 @@ def f(x, d=3, sign=False):
 
 
 def write(name: str, body: str) -> None:
-    (OUT / name).write_text(body, encoding="utf-8")
+    (OUT / name).write_text(body, encoding="utf-8", newline="\n")
     print("wrote tables/" + name)
 
 
@@ -220,17 +220,18 @@ def tab_sample_size() -> None:
 
 def tab_audit_card() -> None:
     import json
-    cards = json.loads((RES / "audit_card.json").read_text(encoding="utf-8"))
+    resp = json.loads((RES / "audit_card.json").read_text(encoding="utf-8"))
     rows = []
-    for c in cards:
-        t = c["audit"]
+    for dom, r in resp.items():
+        t = r["cards"][0]["extension"]["org.causal-cdss.audit"]
         ci = lambda v: f"${v[0]:+.3f}$ [${v[1]:+.3f}$, ${v[2]:+.3f}$]"
         rows.append(f"{DOM[t['domain']]} & {t['first_stage_F']:.0f} & {ci(t['ate_proximal_dr'])} & "
-                    f"{ci(t['ate_proxy_adjusted'])} & {t['gamma_star_design_stage']:.2f} / "
-                    f"{t['delta_star_design_stage']:.2f} & "
-                    f"{t['policy_value_dr']:.3f} & {t['policy_ess_fraction']:.2f} \\\\")
+                    f"{ci(t['ate_proxy_adjusted'])} & {t['gamma_star_reference']:.2f} / "
+                    f"{t['delta_star_reference']:.2f} & "
+                    f"{t['policy_value_dr']:.3f} & {t['policy_ess_fraction']:.2f} & "
+                    f"{t['withhold_share_indicated']:.2f} \\\\")
     write("tab_audit_card.tex", "\n".join(rows))
-    write("card_sepsis.json", json.dumps(cards[0], indent=1))
+    write("card_sepsis.json", json.dumps(resp["sepsis"], indent=1))
 
 
 def tab_misspec() -> None:

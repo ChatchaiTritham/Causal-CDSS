@@ -1,0 +1,16 @@
+parameter,std_coef
+intercept,-0.19
+age_to_sev,0.051
+sev_to_treat,-0.052
+treat_intercept,0.011
+sev_to_out,-0.143
+age_to_out,0.146
+treat_to_out,-0.154
+out_intercept,-0.007
+sev_to_z,-0.035
+sev_to_w,0.09
+u2,-0.308
+rho_zw,-0.276
+gamma,0.07
+delta,0.244
+R2,0.724

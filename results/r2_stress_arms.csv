@@ -1,0 +1,28 @@
+domain,arm,estimator,true_ate,bias,mcse,rmse,coverage,F_median,nonconverged,reps
+ards,Z-W residual correlation 0.3,proxy,-0.1177,0.058,0.0008,0.0591,0.0,4625.7,0,200
+ards,Z-W residual correlation 0.3,2sls,-0.1177,0.0343,0.0008,0.0363,0.14,4625.7,0,200
+ards,Z-W residual correlation 0.3,dr,-0.1177,0.0353,0.0008,0.0372,0.125,4625.7,0,200
+ards,joint gamma*/2 + delta*/2 (DR),proxy,-0.1132,0.0408,0.0008,0.0422,0.01,1882.1,2,200
+ards,joint gamma*/2 + delta*/2 (DR),2sls,-0.1132,-0.0552,0.001,0.0569,0.02,1882.1,2,200
+ards,joint gamma*/2 + delta*/2 (DR),dr,-0.1132,-0.0489,0.0013,0.0523,0.205,1882.1,2,200
+ards,second confounder U2 (0.5),proxy,-0.1147,0.0858,0.0008,0.0865,0.0,1905.6,0,200
+ards,second confounder U2 (0.5),2sls,-0.1147,0.0383,0.0009,0.0402,0.145,1905.6,0,200
+ards,second confounder U2 (0.5),dr,-0.1147,0.0381,0.001,0.0405,0.215,1905.6,0,200
+cardiac,Z-W residual correlation 0.3,proxy,-0.1876,0.0627,0.0008,0.0636,0.0,5863.6,0,200
+cardiac,Z-W residual correlation 0.3,2sls,-0.1876,0.03,0.0009,0.0323,0.28,5863.6,0,200
+cardiac,Z-W residual correlation 0.3,dr,-0.1876,0.0369,0.0009,0.0391,0.235,5863.6,0,200
+cardiac,joint gamma*/2 + delta*/2 (DR),proxy,-0.1793,0.0423,0.0007,0.0436,0.02,2695.1,14,200
+cardiac,joint gamma*/2 + delta*/2 (DR),2sls,-0.1793,-0.0653,0.001,0.0667,0.0,2695.1,14,200
+cardiac,joint gamma*/2 + delta*/2 (DR),dr,-0.1793,-0.0475,0.0017,0.0535,0.58,2695.1,14,200
+cardiac,second confounder U2 (0.5),proxy,-0.1846,0.0815,0.0008,0.0823,0.0,2746.9,3,200
+cardiac,second confounder U2 (0.5),2sls,-0.1846,0.021,0.001,0.0251,0.635,2746.9,3,200
+cardiac,second confounder U2 (0.5),dr,-0.1846,0.0251,0.0013,0.0309,0.825,2746.9,3,200
+sepsis,Z-W residual correlation 0.3,proxy,-0.1615,0.0654,0.0007,0.0662,0.0,5157.4,0,200
+sepsis,Z-W residual correlation 0.3,2sls,-0.1615,0.0354,0.0008,0.037,0.14,5157.4,0,200
+sepsis,Z-W residual correlation 0.3,dr,-0.1615,0.0391,0.0008,0.0408,0.11,5157.4,0,200
+sepsis,joint gamma*/2 + delta*/2 (DR),proxy,-0.1545,0.0464,0.0007,0.0475,0.02,2232.5,5,200
+sepsis,joint gamma*/2 + delta*/2 (DR),2sls,-0.1545,-0.0614,0.0009,0.0628,0.01,2232.5,5,200
+sepsis,joint gamma*/2 + delta*/2 (DR),dr,-0.1545,-0.0471,0.0015,0.0514,0.445,2232.5,5,200
+sepsis,second confounder U2 (0.5),proxy,-0.1582,0.0881,0.0008,0.0887,0.0,2271.7,1,200
+sepsis,second confounder U2 (0.5),2sls,-0.1582,0.0305,0.0009,0.0328,0.38,2271.7,1,200
+sepsis,second confounder U2 (0.5),dr,-0.1582,0.0331,0.0012,0.0369,0.505,2271.7,1,200

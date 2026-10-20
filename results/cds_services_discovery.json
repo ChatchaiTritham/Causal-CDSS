@@ -1,0 +1,14 @@
+{
+  "services": [
+    {
+      "hook": "order-select",
+      "id": "causal-cdss-audit",
+      "title": "Causal audit of a treatment recommender",
+      "description": "Returns the audit verdict (Algorithm 1) for the recommender serving this order.",
+      "prefetch": {
+        "patient": "Patient/{{context.patientId}}",
+        "lactate": "Observation?patient={{context.patientId}}&code=http://loinc.org|2524-7"
+      }
+    }
+  ]
+}

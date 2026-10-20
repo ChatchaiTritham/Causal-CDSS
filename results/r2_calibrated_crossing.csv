@@ -1,0 +1,7 @@
+domain,regime,estimator,gamma_star
+sepsis,calibrated effect,2sls,"none in [0,0.5]"
+sepsis,calibrated effect,dr,0.422
+ards,calibrated effect,2sls,0.176
+ards,calibrated effect,dr,0.247
+cardiac,calibrated effect,2sls,"none in [0,0.5]"
+cardiac,calibrated effect,dr,0.372
