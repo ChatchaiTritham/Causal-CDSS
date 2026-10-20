@@ -106,3 +106,51 @@ Outputs: `results/proximal_estimates.csv`, `results/policy_value_estimates.csv`,
 `results/policy_value_coverage.csv`; figures from `scripts/make_unmeasured_figures.py`.
 
 Reproduce with: `python scripts/unmeasured_confounding.py --reps 200 --n 8000`
+
+## v1.0.3 (2026-10-20): audit extensions, traceability and validation note
+
+New drivers (manuscript Supplementary Sections S16-S20):
+
+- `scripts/proximal_audit_extensions.py` -- 2x2 bridge misspecification with a stacked
+  M-estimation sandwich SE (`results/bridge_misspecification.csv`), misspecified knowledge base
+  for the knowledge-driven rule, population-vs-sample value estimand, convergence exclusion and
+  the auditor-side youngest-third contrast (`results/kb_misspecification.csv`,
+  `results/estimand_checks.csv`).
+- `scripts/crossing_uncertainty.py` -- Monte-Carlo intervals and a common scale for the
+  crossing points (`results/proximal_crossing_ci.csv`).
+- `scripts/audit_card.py` -- card now follows the CDS Hooks 2.0 Card schema (uuid, markdown
+  detail, source.topic, order-select hook); structured numbers in a separate `audit` object;
+  first-stage F threshold 16; interventional truth never written to the card.
+- `tests/test_audit_extensions.py` -- partial-F symmetry, DR = proximal IPW identity, DR
+  consistency with a correct outcome bridge, CDS Hooks required fields.
+
+Note: tag v1.0.2 on the remote points to the same commit as v1.0.1 (121e8a1); it adds no code.
+v1.0.3 is the first release after v1.0.1 with new code.
+
+### Traceability: manuscript element -> script -> result file
+
+| Manuscript element | Script | Result file |
+|---|---|---|
+| Table 1, Fig. S5 (ATE) | scripts/unmeasured_confounding.py | results/proximal_estimates.csv |
+| Table 2, Fig. S7, Table S10 (standard policy value) | scripts/unmeasured_confounding.py | results/policy_value_*.csv |
+| Table 3, Fig. 3, Table S27 (proximal value, subgroups) | scripts/proximal_policy_subgroup.py | results/proximal_policy_value.csv, results/subgroup_audit.csv |
+| Fig. 2, Tables S4-S6, S9, S17-S19 (sweeps, nonlinear, weak, DML, DAG tests) | scripts/proximal_robustness.py | results/proximal_robustness*.csv, proximal_nonlinear.csv, proximal_weak_proxies.csv, proximal_crossing.csv, dml_estimates.csv, dag_implication_tests*.csv |
+| Table S12, Fig. S6 (cohort size) | scripts/sample_size.py | results/sample_size.csv |
+| Table S13 (audit card) | scripts/audit_card.py | results/audit_card.json |
+| Table S14 | scripts/proximal_policy_violation.py | results/proximal_policy_violation.csv |
+| Table S16 (bootstrap) | scripts/proximal_bootstrap.py | results/proximal_bootstrap*.csv |
+| Tables S21, S23, S24 | scripts/proximal_audit_extensions.py | results/bridge_misspecification.csv, kb_misspecification.csv, estimand_checks.csv |
+| Table S22 | scripts/crossing_uncertainty.py | results/proximal_crossing_ci.csv |
+| All LaTeX table bodies | scripts/make_tables.py | tables/*.tex |
+
+Files from the separate verification cohort (`meta_learners*`, `model_comparison*`,
+`causal_metrics.csv`, `cate_subgroups.csv`, `confounding_sensitivity.csv`, `ate_by_domain.csv`)
+support Supplementary Sections S1-S5 and S8 only; they play no part in the audit argument.
+`results/SHA256SUMS` lists the hash of every result file in this release.
+
+### Validation note (intended use)
+
+Research software for method comparison on synthetic data. It is not a validated
+medical-device tool (IEC 62304 / ISO 13485 4.1.6 tool validation has not been performed).
+Credibility evidence is limited to code verification: seeded reproduction of every table and
+the unit tests in `tests/`. Environment: `requirements.txt` (pinned).

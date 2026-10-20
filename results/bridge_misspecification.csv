@@ -1,0 +1,37 @@
+domain,h_bridge,q_bridge,truth,reps,q_nonconverged,estimator,se_type,bias,mcse,emp_sd,median_se,coverage
+sepsis,correct,correct,-0.1616,200,5,proximal_2sls,HC0 two-stage,-0.0009,0.0012,0.0163,0.0153,0.945
+sepsis,correct,correct,-0.1616,200,5,proximal_dr,plug-in,-0.0012,0.0021,0.0292,0.0296,0.965
+sepsis,correct,correct,-0.1616,200,5,proximal_dr,sandwich,0.0001,0.002,0.0278,0.0233,0.928
+sepsis,correct,wrong,-0.1616,200,34,proximal_2sls,HC0 two-stage,0.0005,0.001,0.0143,0.0138,0.92
+sepsis,correct,wrong,-0.1616,200,34,proximal_dr,plug-in,-0.0024,0.002,0.028,0.0222,0.965
+sepsis,correct,wrong,-0.1616,200,34,proximal_dr,sandwich,0.0001,0.0019,0.025,0.0185,0.928
+sepsis,wrong,correct,-0.1616,200,3,proximal_2sls,HC0 two-stage,-0.0102,0.0009,0.0127,0.0132,0.885
+sepsis,wrong,correct,-0.1616,200,3,proximal_dr,plug-in,-0.0036,0.0011,0.0163,0.0267,1.0
+sepsis,wrong,correct,-0.1616,200,3,proximal_dr,sandwich,-0.0036,0.0012,0.0163,0.0162,0.964
+sepsis,wrong,wrong,-0.1616,200,23,proximal_2sls,HC0 two-stage,0.0517,0.0009,0.0121,0.0117,0.005
+sepsis,wrong,wrong,-0.1616,200,23,proximal_dr,plug-in,0.0498,0.0018,0.0253,0.0285,0.52
+sepsis,wrong,wrong,-0.1616,200,23,proximal_dr,sandwich,0.0534,0.0017,0.0221,0.017,0.203
+ards,correct,correct,-0.1178,200,2,proximal_2sls,HC0 two-stage,0.0004,0.0009,0.013,0.0141,0.955
+ards,correct,correct,-0.1178,200,2,proximal_dr,plug-in,-0.0017,0.0012,0.0167,0.0193,0.985
+ards,correct,correct,-0.1178,200,2,proximal_dr,sandwich,-0.0015,0.0012,0.0165,0.0172,0.975
+ards,correct,wrong,-0.1178,200,5,proximal_2sls,HC0 two-stage,0.0007,0.0008,0.0115,0.0129,0.96
+ards,correct,wrong,-0.1178,200,5,proximal_dr,plug-in,0.0013,0.0012,0.0163,0.0159,0.945
+ards,correct,wrong,-0.1178,200,5,proximal_dr,sandwich,0.0011,0.0011,0.0151,0.0148,0.949
+ards,wrong,correct,-0.1178,200,0,proximal_2sls,HC0 two-stage,-0.0027,0.0009,0.0127,0.0127,0.95
+ards,wrong,correct,-0.1178,200,0,proximal_dr,plug-in,-0.0006,0.001,0.0147,0.0203,1.0
+ards,wrong,correct,-0.1178,200,0,proximal_dr,sandwich,-0.0006,0.001,0.0147,0.0139,0.955
+ards,wrong,wrong,-0.1178,200,5,proximal_2sls,HC0 two-stage,0.0378,0.0008,0.0112,0.0113,0.105
+ards,wrong,wrong,-0.1178,200,5,proximal_dr,plug-in,0.0349,0.0011,0.0158,0.0192,0.56
+ards,wrong,wrong,-0.1178,200,5,proximal_dr,sandwich,0.0352,0.0011,0.0154,0.0136,0.246
+cardiac,correct,correct,-0.1877,200,6,proximal_2sls,HC0 two-stage,-0.0014,0.0012,0.0173,0.016,0.92
+cardiac,correct,correct,-0.1877,200,6,proximal_dr,plug-in,-0.0027,0.0028,0.0395,0.0401,0.975
+cardiac,correct,correct,-0.1877,200,6,proximal_dr,sandwich,-0.0006,0.0025,0.0345,0.0282,0.923
+cardiac,correct,wrong,-0.1877,200,29,proximal_2sls,HC0 two-stage,0.0002,0.001,0.0138,0.0146,0.95
+cardiac,correct,wrong,-0.1877,200,29,proximal_dr,plug-in,-0.0012,0.0023,0.0326,0.0288,0.985
+cardiac,correct,wrong,-0.1877,200,29,proximal_dr,sandwich,0.0011,0.0022,0.0285,0.0222,0.936
+cardiac,wrong,correct,-0.1877,200,6,proximal_2sls,HC0 two-stage,-0.0151,0.0009,0.0127,0.0133,0.83
+cardiac,wrong,correct,-0.1877,200,6,proximal_dr,plug-in,-0.0043,0.0013,0.0188,0.0311,1.0
+cardiac,wrong,correct,-0.1877,200,6,proximal_dr,sandwich,-0.0035,0.0013,0.0178,0.017,0.974
+cardiac,wrong,wrong,-0.1877,200,43,proximal_2sls,HC0 two-stage,0.0631,0.0008,0.0116,0.0121,0.005
+cardiac,wrong,wrong,-0.1877,200,43,proximal_dr,plug-in,0.0689,0.0023,0.0319,0.0396,0.59
+cardiac,wrong,wrong,-0.1877,200,43,proximal_dr,sandwich,0.0739,0.0021,0.0268,0.0202,0.172

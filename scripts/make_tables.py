@@ -223,13 +223,81 @@ def tab_audit_card() -> None:
     cards = json.loads((RES / "audit_card.json").read_text(encoding="utf-8"))
     rows = []
     for c in cards:
-        t = c["detail"]
+        t = c["audit"]
         ci = lambda v: f"${v[0]:+.3f}$ [${v[1]:+.3f}$, ${v[2]:+.3f}$]"
-        rows.append(f"{DOM[c['domain']]} & {t['first_stage_F']:.0f} & {ci(t['ate_proximal_dr'])} & "
-                    f"{ci(t['ate_proxy_adjusted'])} & {t['gamma_star']:.2f} / {t['delta_star']:.2f} & "
+        rows.append(f"{DOM[t['domain']]} & {t['first_stage_F']:.0f} & {ci(t['ate_proximal_dr'])} & "
+                    f"{ci(t['ate_proxy_adjusted'])} & {t['gamma_star_design_stage']:.2f} / "
+                    f"{t['delta_star_design_stage']:.2f} & "
                     f"{t['policy_value_dr']:.3f} & {t['policy_ess_fraction']:.2f} \\\\")
     write("tab_audit_card.tex", "\n".join(rows))
     write("card_sepsis.json", json.dumps(cards[0], indent=1))
+
+
+def tab_misspec() -> None:
+    d = pd.read_csv(RES / "bridge_misspecification.csv")
+    lines = []
+    for (h, q), g0 in d.groupby(["h_bridge", "q_bridge"], sort=False):
+        for dm in DOM:
+            g = g0[g0.domain == dm].set_index(["estimator", "se_type"])
+            s2 = g.loc[("proximal_2sls", "HC0 two-stage")]
+            pp = g.loc[("proximal_dr", "plug-in")]
+            sw = g.loc[("proximal_dr", "sandwich")]
+            lines.append(f"{h} & {q} & {DOM[dm]} & {f(s2.bias, 3, True)} & {f(s2.coverage, 2)} & "
+                         f"{f(pp.bias, 3, True)} & {f(pp.emp_sd, 3)} & {f(pp.median_se, 3)} & "
+                         f"{f(sw.median_se, 3)} & {f(pp.coverage, 2)} & {f(sw.coverage, 2)} & "
+                         f"{int(s2.q_nonconverged)} \\\\")
+    write("tab_misspec.tex", "\n".join(lines))
+
+
+ARROW = r"$\to$"
+
+
+def tab_kb() -> None:
+    d = pd.read_csv(RES / "kb_misspecification.csv")
+    lines = []
+    for dm in DOM:
+        for i, (_, r) in enumerate(d[d.domain == dm].iterrows()):
+            lab = r.policy.replace("->", ARROW)
+            lines.append(f"{DOM[dm] if i == 0 else ''} & {lab} & "
+                         f"{f(r.treated, 2)} & {f(r.true_value_pop, 3)} & {f(r.regret, 3)} & "
+                         f"{f(r.dr_cov_sample, 2)} & {f(r.prox_cov_sample, 2)} & "
+                         f"{f(r.prox_cov_pop, 2)} & {f(r.recall_young_010, 2)} / "
+                         f"{f(r.recall_young_015, 2)} / {f(r.recall_young_020, 2)} & "
+                         f"{f(r.young_contrast_true, 3, True)} & {f(r.young_contrast_cov, 2)} \\\\")
+        if dm != "cardiac":
+            lines.append(r"\midrule")
+    write("tab_kb.tex", "\n".join(lines))
+
+
+def tab_crossing_ci() -> None:
+    d = pd.read_csv(RES / "proximal_crossing_ci.csv")
+    lines = []
+    for _, r in d.iterrows():
+        lines.append(f"{DOM[r.domain]} & {'2SLS' if r.estimator == '2sls' else 'DR'} & "
+                     f"{f(r.gamma_star, 2)} [{f(r.gamma_lo, 2)}, {f(r.gamma_hi, 2)}] & "
+                     f"{f(r.gamma_over_betaU, 2)} & "
+                     f"{f(r.delta_star, 2)} [{f(r.delta_lo, 2)}, {f(r.delta_hi, 2)}] & "
+                     f"{f(r.delta_over_sdW, 2)} \\\\")
+    write("tab_crossing_ci.tex", "\n".join(lines))
+
+
+def tab_estimand() -> None:
+    d = pd.read_csv(RES / "estimand_checks.csv")
+    lines = []
+    for dm in DOM:
+        g = d[d.domain == dm]
+        for i, (_, r) in enumerate(g[g.policy != "ATE (DR proximal)"].iterrows()):
+            lines.append(f"{DOM[dm] if i == 0 else ''} & {POL.get(r.policy, 'Age rule')} & "
+                         f"{f(r.prox_cov_sample, 3)} & {f(r.prox_cov_pop, 3)} & "
+                         f"{f(r.dr_cov_sample, 3)} & {f(r.dr_cov_pop, 3)} & "
+                         f"{f(r.young_contrast_cov, 2)} \\\\")
+        a = g[g.policy == "ATE (DR proximal)"].iloc[0]
+        lines.append(f" & ATE, all / converged only & {f(a.prox_cov_sample, 3)} & "
+                     f"{f(a.prox_cov_pop, 3)} & \\multicolumn{{3}}{{l}}{{{a.recall_young_020}, "
+                     f"{a.recall_young_010}}} \\\\")
+        if dm != "cardiac":
+            lines.append(r"\midrule")
+    write("tab_estimand.tex", "\n".join(lines))
 
 
 def tab_proximal_ope() -> None:
@@ -306,3 +374,9 @@ if __name__ == "__main__":
         tab_subgroup()
     if (RES / "proximal_policy_violation.csv").exists():
         tab_policy_violation()
+    if (RES / "bridge_misspecification.csv").exists():
+        tab_misspec()
+        tab_kb()
+        tab_estimand()
+    if (RES / "proximal_crossing_ci.csv").exists():
+        tab_crossing_ci()

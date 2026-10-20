@@ -1,8 +1,23 @@
 {
- "domain": "sepsis",
- "summary": "Causal audit: proximal (doubly robust)",
- "indicator": "info",
- "detail": {
+ "hook": "order-select",
+ "card": {
+  "uuid": "a4d988fe-9078-56e4-bc0e-e7719daac9cd",
+  "summary": "Causal audit (sepsis): proximal (DR form)",
+  "detail": "**Strategy:** proximal (DR form).  \nFirst-stage F = 2353 (threshold 16).  \nATE, proximal DR: -0.177 [-0.210, -0.144]; proxy-adjusted: -0.112 [-0.133, -0.091].  \nDesign-stage crossing points for this graph: gamma* = 0.29, delta* = 0.23 (not estimated from these records).  \nKnowledge-driven rule value (standard DR) 0.316: unverified, confounder not recorded.",
+  "indicator": "info",
+  "source": {
+   "label": "Causal-CDSS audit protocol (Algorithm 1)",
+   "url": "https://github.com/ChatchaiTritham/Causal-CDSS",
+   "topic": {
+    "system": "https://github.com/ChatchaiTritham/Causal-CDSS",
+    "code": "causal-audit",
+    "display": "Causal audit verdict"
+   }
+  }
+ },
+ "audit": {
+  "domain": "sepsis",
+  "intended_population": "synthetic audit cohort; method comparison only",
   "first_stage_F": 2352.8,
   "ate_proximal_dr": [
    -0.177,
@@ -14,16 +29,25 @@
    -0.133,
    -0.091
   ],
-  "gamma_star": 0.291,
-  "delta_star": 0.226,
+  "gamma_star_design_stage": 0.291,
+  "delta_star_design_stage": 0.226,
   "policy": "knowledge-driven rule",
   "policy_value_dr": 0.316,
   "policy_ess_fraction": 0.491,
   "policy_agreement": 0.616,
-  "policy_value_status": "unverified: confounder not recorded"
- },
- "source": {
-  "label": "Causal-CDSS audit protocol (Algorithm 1)",
-  "url": "https://github.com/ChatchaiTritham/Causal-CDSS"
+  "policy_value_status": "unverified: confounder not recorded",
+  "subgroup_table": "results/subgroup_audit.csv",
+  "reaudit_triggers": [
+   "declared DAG or proxy definition changed",
+   "first-stage F below 16",
+   "treatment-assignment practice or guideline changed",
+   "case-mix shift between audit and deployment site"
+  ],
+  "fhir_mapping": {
+   "declared_model": "Library (attached graph)",
+   "proxies": "Observation",
+   "verdict": "GuidanceResponse",
+   "estimate": "Evidence"
+  }
  }
 }
