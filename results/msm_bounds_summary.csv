@@ -1,0 +1,5 @@
+analysis,domain,n_rep,truth,lambda_star_median,lambda_star_q10,lambda_star_q90,lambda_zero_median,lambda_zero_q10,lambda_zero_q90,cov_1.0,excl0_1.0,width_1.0,cov_1.5,excl0_1.5,width_1.5,cov_2.0,excl0_2.0,width_2.0,cov_3.0,excl0_3.0,width_3.0,share_gen_lambda_star_le_1_5,share_gen_lambda_star_le_2,share_gen_lambda_star_inf,n_gen_nonnull,share_nonnull_sign_lost_before_truth
+main,sepsis,100,-0.1614,1.15,1.11,1.18,1.27,1.23,1.31,0.0,1.0,0.0397,1.0,0.0,0.3899,1.0,0.0,0.6279,1.0,0.0,0.937,,,,,
+main,ards,100,-0.1177,1.12,1.09,1.15,1.17,1.13,1.2,0.0,1.0,0.0395,1.0,0.0,0.4071,1.0,0.0,0.6549,1.0,0.0,0.9719,,,,,
+main,cardiac,100,-0.1875,1.15,1.12,1.19,1.37,1.33,1.41,0.01,1.0,0.0401,1.0,0.0,0.3753,1.0,0.0,0.6042,1.0,0.0,0.9052,,,,,
+heldout set B,60 generators,10,,1.17,1.09,1.31,1.18,1.05,1.41,,,,,,,,,,,,,1.0,1.0,0.0,53,0.483

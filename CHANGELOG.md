@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.7 (2026-10-21)
+- scripts/msm_bounds.py: marginal-sensitivity-model (Tan 2006) bounds for the ATE with the
+  Zhao-Small-Bhattacharya percentile bootstrap; smallest Lambda covering the truth and smallest
+  Lambda covering zero on the main generators (100 replications, 100 resamples) and on held-out
+  set B (60 generators, 10 replications). Results results/msm_bounds_*.csv, table tables/msm_bounds.tex.
+- tests/test_msm_bounds.py. Manuscript retargeted to Statistics in Medicine.
+- Regenerate: `python scripts/msm_bounds.py`.
+
 ## v1.0.6 (2026-10-21)
 - scripts/default_loss_audit.py: pre-stated interval-score loss over all three estimator families,
   DR coverage strata, bias/SE decomposition, flag AUC, disagreement-widened interval, AR boundedness.
