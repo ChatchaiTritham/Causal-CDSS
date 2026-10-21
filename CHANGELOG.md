@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.8 (2026-10-21)
+- scripts/sim_review_checks.py (no new simulation): Spearman correlation of flag rate with DR
+  coverage and flag AUC at three thresholds; 90% interval score of the three families; share of
+  held-out replications with an unsolved treatment bridge. Output results/sim_review_checks.csv.
+- msm_bounds.py: third domain labelled ACS in tables/msm_bounds.tex, as in the other tables.
+
 ## v1.0.7 (2026-10-21)
 - scripts/msm_bounds.py: marginal-sensitivity-model (Tan 2006) bounds for the ATE with the
   Zhao-Small-Bhattacharya percentile bootstrap; smallest Lambda covering the truth and smallest

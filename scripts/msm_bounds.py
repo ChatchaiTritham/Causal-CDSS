@@ -190,7 +190,7 @@ def main() -> None:
 
 def make_table() -> None:
     """Write tables/msm_bounds.tex (LaTeX rows) from results/msm_bounds_summary.csv."""
-    names = {"sepsis": "Sepsis", "ards": "ARDS", "cardiac": "STEMI"}
+    names = {"sepsis": "Sepsis", "ards": "ARDS", "cardiac": "ACS"}
     out = []
     for x in csv.DictReader(open(RES / "msm_bounds_summary.csv")):
         if x["analysis"] != "main":

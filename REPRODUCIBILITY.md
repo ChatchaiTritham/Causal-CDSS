@@ -214,3 +214,6 @@ SD/SE and |bias|/SD, disagreement-widened interval, flag AUC), `default_loss_gen
 
 ## v1.0.7 (2026-10-21): marginal-sensitivity bounds
 `python scripts/msm_bounds.py` writes results/msm_bounds_main.csv, msm_bounds_heldout.csv, msm_bounds_summary.csv and tables/msm_bounds.tex (seeds: main-study cohorts, first 100 replications; held-out set B, first 10 replications).
+
+## v1.0.8 (2026-10-21): review checks
+`python scripts/sim_review_checks.py` writes results/sim_review_checks.csv from stored replications.

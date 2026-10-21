@@ -50,3 +50,9 @@ def test_smallest_lambda_is_one_at_point_estimate():
     d = _cohort()
     lo, _, _, _ = mb.ate_bounds(d, 1.0)
     assert mb.smallest_lambda(d, lo) == 1.0
+
+
+def test_iscore90_width_when_covered():
+    import sim_review_checks as sr
+    s = sr.iscore90(np.array([0.0]), np.array([0.1]), 0.0)
+    assert np.isclose(s[0], 2 * sr.Z90 * 0.1)

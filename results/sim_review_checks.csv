@@ -1,0 +1,17 @@
+set,check,value,ci,n
+"A (seed 2027, used in v1 test)",spearman flag_rate vs dr_cov,0.121,-0.16 to 0.37,60
+"A (seed 2027, used in v1 test)","flag AUC, dr_cov < 0.70",0.444,,29
+"A (seed 2027, used in v1 test)","flag AUC, dr_cov < 0.80",0.472,,38
+"A (seed 2027, used in v1 test)","flag AUC, dr_cov < 0.90",0.548,,46
+"A (seed 2027, used in v1 test)","90% interval score, proxy",1.1092,best share 0.20,60
+"A (seed 2027, used in v1 test)","90% interval score, tsls",0.6269,best share 0.33,60
+"A (seed 2027, used in v1 test)","90% interval score, dr",0.4642,best share 0.47,60
+"A (seed 2027, used in v1 test)",share of replications with unsolved q,0.2104,,2400
+"B (seed 2031, fresh)",spearman flag_rate vs dr_cov,-0.007,-0.26 to 0.26,60
+"B (seed 2031, fresh)","flag AUC, dr_cov < 0.70",0.493,,20
+"B (seed 2031, fresh)","flag AUC, dr_cov < 0.80",0.505,,28
+"B (seed 2031, fresh)","flag AUC, dr_cov < 0.90",0.482,,43
+"B (seed 2031, fresh)","90% interval score, proxy",1.0052,best share 0.13,60
+"B (seed 2031, fresh)","90% interval score, tsls",0.5625,best share 0.43,60
+"B (seed 2031, fresh)","90% interval score, dr",0.3928,best share 0.43,60
+"B (seed 2031, fresh)",share of replications with unsolved q,0.2433,,2400
