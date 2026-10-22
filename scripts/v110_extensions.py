@@ -466,6 +466,24 @@ def part_plasmode(workers, reps):
     write("v110_plasmode_summary.csv", summ)
 
 
+def part_plasdiag():
+    """Strength of the real proxies for the withheld confounder (aps1): marginal correlations and
+    partial correlations given X. Added in v1.1.1 after the simulated review (H3-1)."""
+    d, U, _, _ = plas_setup()
+    X1 = add1(d["x"])
+    res = lambda v: v - X1 @ np.linalg.lstsq(X1, v, rcond=None)[0]
+    ru = res(U)
+    rows = []
+    for nm, M in (("Z", d["z"]), ("W", d["w"])):
+        for j, col in enumerate(("pafi1", "paco21") if nm == "Z" else ("ph1", "hema1")):
+            rows.append(dict(role=nm, variable=col, corr_U=r4(np.corrcoef(U, M[:, j])[0, 1]),
+                             partial_corr_U_given_X=r4(np.corrcoef(ru, res(M[:, j]))[0, 1])))
+    rows.append(dict(role="U", variable="aps1", corr_U="", partial_corr_U_given_X="",))
+    rows[-1]["corr_U"] = r4(1 - np.var(ru) / np.var(U))      # R^2 of U on X
+    rows[-1]["variable"] = "aps1 (corr_U column: R^2 of U on X)"
+    write("v110_plasmode_proxy_strength.csv", rows)
+
+
 # =========================================================================== part sharp
 def sharp_main_job(job):
     domain, r, B = job
@@ -746,6 +764,8 @@ def main():
         part_qreg(a.workers, a.qreg_reps)
     if "rhc" in parts:
         part_rhc(a.workers, a.boot)
+    if "plasdiag" in parts:
+        part_plasdiag()
     if "plasmode" in parts:
         part_plasmode(a.workers, a.plas_reps)
 

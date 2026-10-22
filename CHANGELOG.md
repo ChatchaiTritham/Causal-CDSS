@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1 (2026-10-23)
+- v110_extensions.py part plasdiag: correlations and partial correlations (given X) of the real
+  proxies with the withheld APACHE III score; results/v110_plasmode_proxy_strength.csv.
+- CITATION.cff and setup.py version 1.1.1.
+
 ## v1.1.0 (2026-10-23)
 - scripts/rhc_data.py: download (with SHA-256 check) and preparation of the public SUPPORT right
   heart catheterization data (Connors et al. 1996) from https://hbiostat.org/data/repo/rhc.csv.
