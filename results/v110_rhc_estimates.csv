@@ -1,0 +1,21 @@
+outcome,estimator,estimate,se,lo,hi,ci
+dth30,naive,0.0736,0.0111,0.0527,0.0955,bootstrap B=300
+dth30,x_only,0.0666,0.0117,0.0453,0.0894,bootstrap B=300
+dth30,proxy,0.0622,0.0122,0.0401,0.0856,bootstrap B=300
+dth30,aipw,0.0621,0.0144,0.0338,0.0909,bootstrap B=300
+dth30,p2sls,0.0818,0.1119,0.046,0.1935,bootstrap B=300
+dth30,gmm_overid,0.0846,0.0174,0.0505,0.1188,Wald
+dth30,pipw,0.0666,0.0208,0.0296,0.108,bootstrap B=300
+dth30,pdr,0.0672,0.205,0.0295,0.1202,bootstrap B=300
+dth30,pipw_reg,0.0651,,,,point estimate only
+dth30,pdr_reg,0.0658,,,,point estimate only
+days,naive,-1.5182,0.233,-1.9501,-1.0227,bootstrap B=300
+days,x_only,-1.4371,0.235,-1.872,-0.9833,bootstrap B=300
+days,proxy,-1.2817,0.2422,-1.7426,-0.801,bootstrap B=300
+days,aipw,-1.2203,0.2977,-1.8125,-0.66,bootstrap B=300
+days,p2sls,-1.8712,2.2214,-5.147,-1.137,bootstrap B=300
+days,gmm_overid,-1.8599,0.3807,-2.606,-1.1138,Wald
+days,pipw,-1.2435,0.4257,-2.2178,-0.5673,bootstrap B=300
+days,pdr,-1.2623,3.8275,-2.4865,-0.5813,bootstrap B=300
+days,pipw_reg,-1.2364,,,,point estimate only
+days,pdr_reg,-1.2915,,,,point estimate only

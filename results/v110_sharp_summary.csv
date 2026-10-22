@@ -1,0 +1,5 @@
+analysis,domain,reps,truth,lstar_tan_med,lstar_sharp_med,l0_tan_med,l0_sharp_med,width_ratio_1_5,width_sharp_1_5,width_tan_1_5,share_sign_lost_before_truth_sharp,cov_sharp_1.0,excl0_sharp_1.0,cov_sharp_1.15,excl0_sharp_1.15,cov_sharp_1.5,excl0_sharp_1.5,cov_sharp_2.0,excl0_sharp_2.0
+main,sepsis,100,-0.1614,1.15,1.2,1.27,1.35,0.7677,0.2693,0.3508,0.02,0.0,1.0,0.72,1.0,1.0,0.0,1.0,0.0
+main,ards,100,-0.1177,1.12,1.14,1.17,1.2,0.8181,0.302,0.3691,0.18,0.0,1.0,0.96,0.27,1.0,0.0,1.0,0.0
+main,cardiac,100,-0.1875,1.15,1.225,1.37,1.51,0.7096,0.2375,0.3347,0.0,0.0,1.0,0.56,1.0,1.0,0.01,1.0,0.0
+heldout B,60 generators,10,,1.175,1.225,,,,,,0.4849,0.483,53,1.0,1.0,0.0,,,

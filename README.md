@@ -103,6 +103,16 @@ offset, so results do not depend on process order or hash salting. The backdoor 
 is reported twice: on age only (`backdoor_observed`) and on age plus both proxies
 (`backdoor_proxy`), the fair competitor for the proximal estimator.
 
+### v1.1.0: real data, plasmode, sharp bounds, regularised bridge, propositions
+
+```bash
+python scripts/rhc_data.py                 # downloads rhc.csv (public, not redistributed), checks SHA-256
+python scripts/v110_extensions.py --parts theory,sharp,qreg,plasmode,rhc --workers 7
+```
+
+The RHC data (Connors et al., JAMA 1996;276:889-897) are fetched from the Vanderbilt
+Biostatistics data repository and are not included here.
+
 ## Verification-cohort figures
 
 The descriptions below pair each original plotting script with the numbers in `results/` that it visualises. Run `python figures/generate_figures.py` to produce them.
@@ -118,7 +128,9 @@ If you prefer the raw evidence, `results/causal_metrics.csv` is the most compact
 
 ## Data
 
-No patient data is used. Each domain is a synthetic cohort sampled from a structural causal model whose mechanisms (severity from age, treatment from severity, mortality from severity, age and treatment) are written out in `run_all.py`. Because the data are simulated and contain no human subjects, no ethics approval or IRB review applies.
+The simulation studies use no patient data. The real-data application and plasmode study (v1.1.0)
+use the public, de-identified SUPPORT right heart catheterization dataset, downloaded by
+`scripts/rhc_data.py` and not redistributed. Each domain is a synthetic cohort sampled from a structural causal model whose mechanisms (severity from age, treatment from severity, mortality from severity, age and treatment) are written out in `run_all.py`. Because the data are simulated and contain no human subjects, no ethics approval or IRB review applies.
 
 ## Citation
 

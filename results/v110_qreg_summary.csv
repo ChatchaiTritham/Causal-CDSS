@@ -1,0 +1,3 @@
+set,reps,old_unsolved_stored,plain_unsolved_1e6,plain_imbalance_gt_0.01,plain_optimiser_fail,plain_abs_bias_mean_gen,plain_rmse,plain_coverage,plain_coverage_mcse,reg_unsolved_1e6,reg_imbalance_gt_0.01,reg_optimiser_fail,reg_abs_bias_mean_gen,reg_rmse,reg_coverage,reg_coverage_mcse,reg_share_lambda_pos
+"A (seed 2027, used in v1 test)",2400,0.2104,0.2104,0.1954,0.0,0.0557,0.09,0.6267,0.0099,0.2104,0.2104,0.0,0.0526,0.08,0.5967,0.01,0.2104
+"B (seed 2031, fresh)",2400,0.2433,0.2433,0.2288,0.0,0.0496,0.0888,0.7258,0.0091,0.2433,0.2433,0.0,0.0466,0.0767,0.6937,0.0094,0.2433

@@ -1,0 +1,22 @@
+scen,estimator,reps,truth,bias,bias_mcse,rmse,coverage,coverage_mcse
+null,x_only,100,0.0,0.0345,0.0014,0.0371,0.31,0.0462
+null,proxy,100,0.0,0.0307,0.0013,0.0335,0.36,0.048
+null,aipw,100,0.0,0.0288,0.0017,0.0332,0.56,0.0496
+null,tsls,100,0.0,0.0299,0.0015,0.0334,0.61,0.0488
+null,dr_plain,100,0.0,0.031,0.0021,0.0373,0.79,0.0407
+null,selection: always DR,100,0.0,,,,0.52,0.05
+null,selection: always proxy,100,0.0,,,,0.48,0.05
+null,selection: v1 rule (elicited gamma=delta=0),100,0.0,,,,0.5,0.05
+null,selection: v2 flags -> proxy when flagged,100,0.0,,,,0.5,0.05
+null,diag: q unsolved / median max|m| / flagged / median F,100,,0.92,0.0187,0.92,26.6209,
+harm,x_only,100,0.0788,0.038,0.0013,0.04,0.18,0.0384
+harm,proxy,100,0.0788,0.0343,0.0012,0.0365,0.27,0.0444
+harm,aipw,100,0.0788,0.0277,0.0015,0.0315,0.63,0.0483
+harm,tsls,100,0.0788,0.0304,0.0017,0.0347,0.61,0.0488
+harm,dr_plain,100,0.0788,0.0275,0.0021,0.0343,0.93,0.0255
+harm,selection: always DR,100,0.0788,,,,0.71,0.0454
+harm,selection: always proxy,100,0.0788,,,,0.29,0.0454
+harm,selection: v1 rule (elicited gamma=delta=0),100,0.0788,,,,0.38,0.0485
+harm,selection: v2 flags -> proxy when flagged,100,0.0788,,,,0.38,0.0485
+harm,diag: q unsolved / median max|m| / flagged / median F,100,,0.85,0.0187,0.85,26.5955,
+all,"partial corr(Z,W | X, U) max abs",,,0.5249,,,,

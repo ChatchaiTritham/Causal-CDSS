@@ -1,0 +1,2 @@
+n,n_treated,deaths30,p_x,F_ph1,F_hema1,dth30_hansenJ,dth30_J_df,dth30_J_p,dth30_q_maxmom_plain,dth30_q_maxmom_reg,dth30_boot_ok_plain,dth30_boot_q_unsolved_plain,days_hansenJ,days_J_df,days_J_p,days_q_maxmom_plain,days_q_maxmom_reg,days_boot_ok_plain,days_boot_q_unsolved_plain,lambda0_tan,lambda0_sharp,width15_tan,width15_sharp
+5735,2184,1918,67,1098.5945,25.9019,0.5274,3,0.9128,0.00148747101057697,0.011665214588436841,300,0.8833,0.287,3,0.9625,0.00148747101057697,0.011665214588436841,300,0.8833,1.14,1.21,0.3608,0.2735

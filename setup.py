@@ -10,7 +10,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="causal-cdss",
-    version="1.0.6",
+    version="1.1.0",
     author="Chatchai Tritham, Chakkrit Snae Namahoot",
     author_email="chatchait66@nu.ac.th, chakkrits@nu.ac.th",
     description=(

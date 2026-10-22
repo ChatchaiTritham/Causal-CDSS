@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.1.0 (2026-10-23)
+- scripts/rhc_data.py: download (with SHA-256 check) and preparation of the public SUPPORT right
+  heart catheterization data (Connors et al. 1996) from https://hbiostat.org/data/repo/rhc.csv.
+  The file is not redistributed (data/rhc/ is git-ignored); proxies as in Cui et al. (2024).
+- scripts/v110_extensions.py: real-data application (proxy-adjusted OLS, proximal 2SLS, over-
+  identified GMM with Hansen J, proximal IPW/DR, AIPW, bootstrap CIs, Tan and sharp sensitivity
+  values); plasmode study on the RHC cohort with the APACHE III score withheld as the confounder;
+  sharp marginal-sensitivity bounds (Dorn and Guo 2023) on the main and held-out generators;
+  Tikhonov-regularised treatment-bridge solver rerun on held-out sets A and B; numerical checks of
+  Propositions 1-3. Results results/v110_*.csv.
+- tests/test_v110_extensions.py.
+- Regenerate: `python scripts/rhc_data.py && python scripts/v110_extensions.py` (set
+  OMP_NUM_THREADS=1 when using several workers).
+
 ## v1.0.8 (2026-10-21)
 - scripts/sim_review_checks.py (no new simulation): Spearman correlation of flag rate with DR
   coverage and flag AUC at three thresholds; 90% interval score of the three families; share of
