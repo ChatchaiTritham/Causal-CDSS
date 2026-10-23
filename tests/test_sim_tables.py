@@ -7,8 +7,16 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def test_sim_tables_regenerate_identically():
-    names = ["v2_rule_sim.tex", "v3_loss.tex", "v3_strata.tex"]
+    names = ["v2_rule_sim.tex", "v3_loss.tex", "v3_strata.tex", "v110_rhc.tex"]
     before = {n: (REPO / "tables" / n).read_bytes() for n in names}
     subprocess.run([sys.executable, str(REPO / "scripts" / "make_tables_sim.py")], check=True)
     for n in names:
         assert (REPO / "tables" / n).read_bytes() == before[n], n
+
+
+def test_rhc_table_matches_published_values():
+    """Spot values of the RHC application table, as printed in the manuscript."""
+    t = (REPO / "tables" / "v110_rhc.tex").read_text(encoding="utf-8")
+    assert "Proxy adjustment, $(X, Z, W)$ & 0.062 (0.040, 0.086)" in t
+    assert "Proximal 2SLS & 0.082 (0.046, 0.194) & $-1.87$ ($-5.15$, $-1.14$)" in t
+    assert "Proximal DR & 0.067 (0.030, 0.120) & $-1.26$ ($-2.49$, $-0.58$)" in t

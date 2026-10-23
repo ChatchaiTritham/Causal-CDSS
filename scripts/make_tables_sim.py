@@ -3,7 +3,11 @@
 tables/v2_rule_sim.tex  <- results/v2_rule_summary.csv    (Supplementary Table S37)
 tables/v3_loss.tex      <- results/default_loss_summary.csv (main Table 3)
 tables/v3_strata.tex    <- results/default_loss_strata.csv  (Supplementary Table S51)
+tables/v110_rhc.tex     <- results/v110_rhc_estimates.csv   (main table of the RHC application)
+
+Rounding of the RHC table is half-up on the four-decimal values stored in the CSV.
 """
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 import pandas as pd
@@ -63,8 +67,31 @@ def strata_table():
     return out
 
 
+def _r(x, dp):
+    """Half-up rounding of the CSV string value, with a typeset minus sign."""
+    q = Decimal(1).scaleb(-dp)
+    s = str(Decimal(str(x)).quantize(q, rounding=ROUND_HALF_UP))
+    return f"${s}$" if s.startswith("-") else s
+
+
+def rhc_table():
+    d = pd.read_csv(RES / "v110_rhc_estimates.csv", dtype={"estimate": str, "lo": str, "hi": str})
+    rows = [("naive", "Unadjusted"), ("x_only", "Regression on $X$"),
+            ("proxy", "Proxy adjustment, $(X, Z, W)$"), ("aipw", "AIPW on $(X, Z, W)$"),
+            ("p2sls", "Proximal 2SLS"), ("gmm_overid", "Proximal GMM, over-identified"),
+            ("pipw", "Proximal IPW"), ("pdr", "Proximal DR")]
+    out = []
+    for key, lab in rows:
+        cells = []
+        for outcome, dp in [("dth30", 3), ("days", 2)]:
+            r = d[(d.outcome == outcome) & (d.estimator == key)].iloc[0]
+            cells.append(f"{_r(r.estimate, dp)} ({_r(r.lo, dp)}, {_r(r.hi, dp)})")
+        out.append(f"{lab} & {cells[0]} & {cells[1]} \\\\")
+    return out
+
+
 if __name__ == "__main__":
     for name, rows in [("v2_rule_sim.tex", rule_table()), ("v3_loss.tex", loss_table()),
-                       ("v3_strata.tex", strata_table())]:
+                       ("v3_strata.tex", strata_table()), ("v110_rhc.tex", rhc_table())]:
         (TAB / name).write_text("\n".join(rows) + "\n", encoding="utf-8", newline="\n")
         print("wrote", TAB / name)

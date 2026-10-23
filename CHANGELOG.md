@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.3 (2026-10-23)
+
+- `scripts/make_tables_sim.py` now also writes `tables/v110_rhc.tex` (the RHC application table)
+  from `results/v110_rhc_estimates.csv`; the table was previously typeset by hand from that file.
+  `tests/test_sim_tables.py` checks byte-identical regeneration and spot values.
+- `MANUSCRIPT_MAP.md`: every table and figure of the Biometrical Journal manuscript and its
+  Supporting Information mapped to the script and result file that produce it, with run order,
+  seeds and software versions.
+- CITATION.cff and setup.py version 1.1.3.
+
 ## v1.1.2 (2026-10-23)
 - scripts/make_tables_sim.py: writes the held-out tables of the Statistics in Medicine
   manuscript (tables/v2_rule_sim.tex, v3_loss.tex, v3_strata.tex) from results/v2_rule_summary.csv,
