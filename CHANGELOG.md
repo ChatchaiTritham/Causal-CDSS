@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.4 (2026-10-23)
+
+- `MANUSCRIPT_MAP.md`: run order completed (`crossing_uncertainty.py`, `proximal_audit_extensions.py`,
+  `sim_review_checks.py` added; legacy scripts listed as not used); description of
+  `scripts/run_paper.py` corrected. No code or result changed.
+- CITATION.cff and setup.py version 1.1.4.
+
 ## v1.1.3 (2026-10-23)
 
 - `scripts/make_tables_sim.py` now also writes `tables/v110_rhc.tex` (the RHC application table)

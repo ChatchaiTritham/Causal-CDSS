@@ -1,4 +1,4 @@
-# Manuscript map (Biometrical Journal submission, release v1.1.3)
+# Manuscript map (Biometrical Journal submission, release v1.1.4)
 
 Every table and figure of the manuscript "Proximal versus proxy-adjusted estimation under
 unmeasured confounding" and of its Supporting Information is listed with the script that writes it
@@ -33,15 +33,17 @@ SHA-256 checksum `9ef4ab578be4b40ad5d97d3a7e08ffdc1f9f76aeeefee51b4996e4221556f8
 ```bash
 python scripts/unmeasured_confounding.py      # main study  -> results/proximal_estimates.csv, policy_value_*.csv
 python scripts/proximal_robustness.py         # sweeps, weak proxies, nonlinear, DML, falsification
-python scripts/seed_replication.py
-python scripts/proximal_bootstrap.py
-python scripts/sample_size.py
-python scripts/proximal_policy_subgroup.py    # -> results/proximal_policy_value.csv
-python scripts/proximal_policy_violation.py
-python scripts/audit_card.py
+python scripts/crossing_uncertainty.py        # -> results/proximal_crossing.csv, proximal_crossing_ci.csv
+python scripts/proximal_bootstrap.py          # -> results/proximal_bootstrap*.csv
+python scripts/sample_size.py                 # -> results/sample_size.csv
+python scripts/proximal_policy_subgroup.py    # -> results/proximal_policy_value.csv, subgroup_audit.csv
+python scripts/proximal_policy_violation.py   # -> results/proximal_policy_violation.csv
+python scripts/proximal_audit_extensions.py   # -> results/bridge_misspecification.csv, estimand_checks.csv, kb_misspecification.csv
+python scripts/audit_card.py                  # -> results/audit_card.json
 python scripts/review_round2.py               # -> results/r2_*.csv
-python scripts/decision_rule_v2.py && python scripts/decision_rule_v2.py --part weak
-python scripts/default_loss_audit.py          # -> results/default_loss_*.csv
+python scripts/decision_rule_v2.py && python scripts/decision_rule_v2.py --part weak   # -> results/v2_*.csv
+python scripts/default_loss_audit.py          # -> results/default_loss_*.csv, ar_bounded.csv, v2_rule_reps.csv
+python scripts/sim_review_checks.py           # -> results/sim_review_checks.csv (numbers quoted in the text)
 python scripts/msm_bounds.py                  # -> results/msm_bounds_*.csv
 python scripts/rhc_data.py
 python scripts/v110_extensions.py --parts theory,sharp,qreg,plasmode,rhc --workers 7
@@ -53,8 +55,12 @@ python scripts/make_tables_sim.py
 pytest -q
 ```
 
-`python scripts/run_paper.py` reruns the first block and checks the result files against
-`results/SHA256SUMS_paper`.
+`python scripts/run_paper.py` reruns the main-study, sweep, policy, audit-extension, crossing and
+round-2 drivers and checks their result files against `results/SHA256SUMS_paper`; the held-out,
+sensitivity-bound, RHC and plasmode results are checked by the tests below.
+`scripts/seed_replication.py`, `scripts/model_comparison.py`, `scripts/meta_learners.py`,
+`scripts/dag_sensitivity.py` and the `make_*_figure.py`/`make_meta_table.py` scripts belong to an
+earlier verification cohort and are not used by this manuscript.
 
 ## Main article
 
