@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.2 (2026-10-23)
+- scripts/make_tables_sim.py: writes the held-out tables of the Statistics in Medicine
+  manuscript (tables/v2_rule_sim.tex, v3_loss.tex, v3_strata.tex) from results/v2_rule_summary.csv,
+  default_loss_summary.csv and default_loss_strata.csv; previously these three tables had no
+  generating script. tests/test_sim_tables.py checks byte-identical regeneration.
+- scripts/v112_review.py: proximal 2SLS in the RHC data with every single-proxy pair and with the
+  proxy roles swapped (results/v112_rhc_proxy_roles.csv, tables/v112_roles.tex); figure of the
+  held-out generators (figures/fig_heldout.pdf) and pairwise RMSE shares
+  (results/v112_heldout_pairwise.csv).
+- CITATION.cff and setup.py version 1.1.2.
+
 ## v1.1.1 (2026-10-23)
 - v110_extensions.py part plasdiag: correlations and partial correlations (given X) of the real
   proxies with the withheld APACHE III score; results/v110_plasmode_proxy_strength.csv.

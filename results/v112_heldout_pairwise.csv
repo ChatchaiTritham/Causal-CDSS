@@ -1,0 +1,3 @@
+set,generators,share_tsls_rmse_below_dr,share_proxy_rmse_below_dr,share_never_flagged
+"A (seed 2027, used in v1 test)",60,0.73,0.43,0.27
+"B (seed 2031, fresh)",60,0.8,0.4,0.32
